@@ -1,3 +1,6 @@
+from tkinter.constants import NO
+
+
 class OrderedSet:
     def __init__(self):
         self.__head = None
@@ -5,33 +8,25 @@ class OrderedSet:
         self.__size = 0
 
     def push(self, node) -> None:
-        # If set is empty, assign head
-        if not self.__head:
-            self.__head = node
-        
-        # Relink tail
-        self.__tail = self.link_tail(node)
-
-        self.increment_size()
-
-    def link_tail(self, node) -> None:
         """
         Link new node with tail node.
         Return None.
         """
 
+        # If set is empty, assign head
+        if not self.__head:
+            self.__head = node
+        
+        # Relink tail
         if self.__tail:
             self.__tail.set_next(node)
             node.set_prev(self.__tail)
 
-            self.__tail = node
-        
-        return None
+        self.__tail = node
+
+        self.increment_size()
 
     def pop(self):
-        return self.unlink_head()
-
-    def unlink_head(self):
         """
         Unlink head tail with it's sibling.
         Assign new head tail and return unlinked one.
@@ -54,6 +49,14 @@ class OrderedSet:
     
     def get_size(self) -> int:
         return self.__size
+    
+    def print(self) -> None:
+        current_node = self.__head
+
+        while current_node:
+            print(current_node)
+
+            current_node = current_node.get_next()
 
 class Node():
     def __init__(self):

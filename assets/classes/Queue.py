@@ -1,4 +1,4 @@
-from OrderedSet import OrderedSet
+from .OrderedSet import OrderedSet
 
 class Queue:
     def __init__(self):
@@ -19,7 +19,7 @@ class Queue:
         client.set_order_number(current_order_number)
 
         # Enqueue client
-        self.__queue.add(client)
+        self.__queue.push(client)
         
         # Increment order number
         self.increment_order_number()
@@ -58,8 +58,7 @@ class Queue:
     def preview(self):
         print(f"Current queue ({self.get_size()}):")
         
-        for client in self.__queue:
-            print(f"\t{client}")
+        self.__queue.print()
 
 
     def get_order_number(self):

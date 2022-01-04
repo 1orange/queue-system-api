@@ -1,5 +1,4 @@
 import tkinter
-import time
 
 from assets.classes.Client import Client
 from assets.classes.Queue import Queue
@@ -30,15 +29,14 @@ if __name__ == "__main__":
     clients = set()
     queue = Queue()
 
-    for _ in range(100):
+    for _ in range(15):
         current_client = Client()
         clients.add(current_client)
 
         queue.enqueue(current_client)
 
-        #time.sleep(0.5)
-
-    print(queue.get_size())
+    #print(queue.get_size())
+    queue.preview()
     #print(clients)
 
 
