@@ -10,6 +10,7 @@ pendulum = "^2.1.2"
 Flask = "^2.0.2"
 addict = "^2.4.0"
 PyYAML = "^6.0"
+Flask-RESTful = "^0.3.9"
 
 [tool.poetry.dev-dependencies]
 

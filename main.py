@@ -1,50 +1,36 @@
 import logging
 import logging.config
-import tkinter
 
 from assets.classes.Client import Client
 from assets.classes.Queue import Queue
 from assets.helpers.loaders import load_yaml_config
 
-def init_canvas():
-    root = tkinter.Tk()
-    root.title('intersection')
-    canvas = tkinter.Canvas(root, width = '800', height = '800', bg = 'white')
-    canvas.pack(side='right')
+from flask import Flask, request
+from flask_restful import Api, Resource
 
-    return root, canvas
+app = Flask(__name__)
+api = Api(app)
 
-def canvas_create_buttons(root, queue):
-    doButton = tkinter.Button(root, text = 'add car', command = lambda:add())
-    doButton.pack()
+logger = logging.getLogger(__name__)
 
-    removeButton = tkinter.Button(root, text = 'remove car', command = lambda:remove())
-    removeButton.pack()
+queue = Queue(logger)
 
-    but = tkinter.Button(root, text = 'asd car', command = lambda:move())
-    but.pack()
+class Lobby(Resource):
+    def get(self):
+        return {'order_number': queue.enqueue(Client())}
+
+api.add_resource(Lobby, "/lobby")
+
 
 if __name__ == "__main__":
-    # Init canvas
-    #tk_root, canvas = init_canvas()
-
-    config = load_yaml_config()
-
+    # Load config and set-up logger
+    config = load_yaml_config()    
     logging.config.dictConfig(config.logging)
 
-    logger = logging.getLogger(__name__)
+    #for _ in range(15):
+    #    current_client = Client()
+    #    queue.enqueue(current_client)
+    #queue.preview()
 
-    queue = Queue(logger)
+    app.run(debug=True)
 
-    for _ in range(15):
-        current_client = Client()
-        queue.enqueue(current_client)
-
-    #print(queue.get_size())
-    queue.preview()
-    #print(clients)
-
-    # Insert buttons
-    #canvas_create_buttons(tk_root, canvas, queue)
-
-    #tk_root.mainloop()
