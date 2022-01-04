@@ -1,7 +1,10 @@
+import logging
+import logging.config
 import tkinter
 
 from assets.classes.Client import Client
 from assets.classes.Queue import Queue
+from assets.helpers.loaders import load_yaml_config
 
 def init_canvas():
     root = tkinter.Tk()
@@ -21,24 +24,25 @@ def canvas_create_buttons(root, queue):
     but = tkinter.Button(root, text = 'asd car', command = lambda:move())
     but.pack()
 
-
 if __name__ == "__main__":
     # Init canvas
     #tk_root, canvas = init_canvas()
 
-    clients = set()
-    queue = Queue()
+    config = load_yaml_config()
+
+    logging.config.dictConfig(config.logging)
+
+    logger = logging.getLogger(__name__)
+
+    queue = Queue(logger)
 
     for _ in range(15):
         current_client = Client()
-        clients.add(current_client)
-
         queue.enqueue(current_client)
 
     #print(queue.get_size())
     queue.preview()
     #print(clients)
-
 
     # Insert buttons
     #canvas_create_buttons(tk_root, canvas, queue)

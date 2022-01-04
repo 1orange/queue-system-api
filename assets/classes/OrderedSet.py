@@ -1,8 +1,6 @@
-from tkinter.constants import NO
-
-
 class OrderedSet:
-    def __init__(self):
+    def __init__(self, logger):
+        self.__logger = logger
         self.__head = None
         self.__tail = None
         self.__size = 0
@@ -54,7 +52,7 @@ class OrderedSet:
         current_node = self.__head
 
         while current_node:
-            print(current_node)
+            self.__logger.info(current_node)
 
             current_node = current_node.get_next()
 

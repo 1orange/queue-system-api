@@ -7,6 +7,9 @@ authors = ["1orange <orangel33t@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.6"
 pendulum = "^2.1.2"
+Flask = "^2.0.2"
+addict = "^2.4.0"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 

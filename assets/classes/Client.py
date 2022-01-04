@@ -1,5 +1,5 @@
 from .OrderedSet import Node
-from ..helpers.initiator import generate_unique_client_id
+from ..helpers.generators import generate_unique_client_id
 
 class Client(Node):
     def __init__(self, order_number=0, priority=0):

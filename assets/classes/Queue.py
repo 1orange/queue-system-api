@@ -1,11 +1,11 @@
 from .OrderedSet import OrderedSet
 
 class Queue:
-    def __init__(self):
-        self.__queue = OrderedSet()
+    def __init__(self, logger):
+        self.__queue = OrderedSet(logger)
         self.__latest_order_number = 1
         self.__queue_size = 0
-
+        self.__logger = logger
 
     def enqueue(self, client):
         """
@@ -49,14 +49,13 @@ class Queue:
         
         return current_client.get_order_number()
 
-
     def __sort_queue(self):
         # TODO: Sort based on client's priority
         pass
 
     
     def preview(self):
-        print(f"Current queue ({self.get_size()}):")
+        self.__logger.info(f"Current queue ({self.get_size()}):")
         
         self.__queue.print()
 
