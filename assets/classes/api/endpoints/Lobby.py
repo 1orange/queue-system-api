@@ -3,6 +3,7 @@ from flask_restful import Resource
 from assets.classes.Client import Client
 from main import queue
 
+
 class Lobby(Resource):
     def get(self):
         current_client = queue.enqueue(Client())

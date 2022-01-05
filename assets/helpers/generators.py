@@ -5,6 +5,7 @@ import random
 from hashlib import sha256
 from pathlib import Path
 
+
 def generate_unique_client_id():
     """ Return SHA256 hash of current timestamp in UNIX format """
 
@@ -14,6 +15,7 @@ def generate_unique_client_id():
     return sha256(
         f"{current_timestamp}{curent_salt}".encode('utf-8')
     ).hexdigest(), current_timestamp
+
 
 def generate_config_path():
     return os.path.abspath(os.path.join('assets', 'config', 'config.yaml'))

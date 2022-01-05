@@ -2,6 +2,7 @@ from flask_restful import Resource
 
 from main import queue
 
+
 class Status(Resource):
     def get(self):
         clients = queue.get_iterable()

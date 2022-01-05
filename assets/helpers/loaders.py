@@ -5,6 +5,7 @@ import yaml
 
 from .generators import generate_config_path
 
+
 def load_yaml_file(file) -> Dict:
     """ Load yaml file and return as dict. """
     with open(file) as yaml_file:
@@ -13,6 +14,7 @@ def load_yaml_file(file) -> Dict:
                 yaml_file
             )
         )
+
 
 def load_yaml_config() -> Dict:
     """ Load config file. """
