@@ -1,3 +1,4 @@
+from typing import Iterable
 from .OrderedSet import OrderedSet
 
 class Queue:
@@ -27,7 +28,7 @@ class Queue:
         # Increment queue size
         self.increment_queue_size()
         
-        return client.get_order_number()
+        return client
 
     def dequeue(self):
         """
@@ -53,6 +54,8 @@ class Queue:
         # TODO: Sort based on client's priority
         pass
 
+    def get_iterable(self):
+        return self.__queue.get_iterable()
     
     def preview(self):
         self.__logger.info(f"Current queue ({self.get_size()}):")

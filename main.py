@@ -17,9 +17,31 @@ queue = Queue(logger)
 
 class Lobby(Resource):
     def get(self):
-        return {'order_number': queue.enqueue(Client())}
+        current_client = queue.enqueue(Client())
+
+        return {
+            'id': current_client.get_id(),
+            'order_number': current_client.get_order_number(),
+            'timestamp': current_client.get_iso_timestamp()
+        }
+
+class Status(Resource):
+    def get(self):
+        clients = queue.get_iterable()
+
+        return {
+            'Clients in queue': len(clients),
+            'Clients': [
+                {
+                    'id': client.get_id(),
+                    'order_number': client.get_order_number(),
+                    'timestamp': client.get_iso_timestamp(),
+                } for client in clients
+            ]
+        }
 
 api.add_resource(Lobby, "/lobby")
+api.add_resource(Status, "/status")
 
 
 if __name__ == "__main__":

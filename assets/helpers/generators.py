@@ -13,7 +13,7 @@ def generate_unique_client_id():
 
     return sha256(
         f"{current_timestamp}{curent_salt}".encode('utf-8')
-    ).hexdigest()
+    ).hexdigest(), current_timestamp
 
 def generate_config_path():
     return os.path.abspath(os.path.join('assets', 'config', 'config.yaml'))

@@ -7,12 +7,18 @@ class Client(Node):
         super().__init__()
 
         # Create own preporties
-        self.__id = generate_unique_client_id()
+        self.__id, self.__timestamp = generate_unique_client_id()
         self.__order_number = order_number
         self.__priority = priority
 
     def get_id(self):
         return self.__id
+    
+    def get_unix_timestamp(self):
+        return self.__timestamp.timestamp()
+    
+    def get_iso_timestamp(self):
+        return self.__timestamp.to_iso8601_string()
 
     def get_order_number(self):
         return self.__order_number

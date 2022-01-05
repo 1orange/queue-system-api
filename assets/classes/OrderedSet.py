@@ -48,6 +48,18 @@ class OrderedSet:
     def get_size(self) -> int:
         return self.__size
     
+    def get_iterable(self):
+        queue_entities = []
+
+        current_node = self.__head
+
+        while current_node:
+            queue_entities.append(current_node)
+
+            current_node = current_node.get_next()
+        
+        return queue_entities
+    
     def print(self) -> None:
         current_node = self.__head
 
