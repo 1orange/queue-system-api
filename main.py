@@ -1,3 +1,7 @@
+"""
+Purpose of this module is to define global variables used among other modules.
+"""
+
 import logging
 import logging.config
 
