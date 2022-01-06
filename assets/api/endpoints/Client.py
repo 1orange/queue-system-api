@@ -4,24 +4,24 @@ from marshmallow import Schema, fields
 
 from flask_restful import Resource
 
-from assets.classes.Client import Client
-from main import queue
+from assets.classes.ClientClass import Client
+from main import clients_queue
 
 
-class Queue(Schema):
+class Client(Schema):
     id = fields.Str()
     order_number = fields.Int()
-    timestamp = fields.Date()
+    timestamp = fields.Str()
 
-class QueueEndpoint(MethodResource, Resource):
+class ClientEndpoint(MethodResource, Resource):
 
     @doc(
         description='Endpoint used for joining the queue',
-        tags=['Queue']
+        tags=['Client']
     )
-    @marshal_with(Queue)
+    @marshal_with(Client)
     def get(self):
-        current_client = queue.enqueue(Client())
+        current_client = clients_queue.enqueue(Client())
 
         return {
             'id': current_client.get_id(),

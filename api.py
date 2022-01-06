@@ -3,7 +3,7 @@ from main import logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 
-from assets.api.endpoints.Queue import QueueEndpoint
+from assets.api.endpoints.Client import ClientEndpoint
 from assets.api.endpoints.Status import StatusEndpoint
 
 from flask import Flask
@@ -26,10 +26,12 @@ app.config.update({
 
 docs = FlaskApiSpec(app)
 
-api.add_resource(QueueEndpoint, "/queue")
+# Create endpoint route
+api.add_resource(ClientEndpoint, "/client")
 api.add_resource(StatusEndpoint, "/status")
 
-docs.register(QueueEndpoint)
+# Add endpoints to swagger
+docs.register(ClientEndpoint)
 docs.register(StatusEndpoint)
 
 if __name__ == "__main__":

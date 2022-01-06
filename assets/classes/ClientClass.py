@@ -1,4 +1,4 @@
-from .OrderedSet import Node
+from .data.OrderedSet import Node
 from ..helpers.generators import generate_unique_client_id
 
 

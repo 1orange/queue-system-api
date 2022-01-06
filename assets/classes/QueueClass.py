@@ -1,8 +1,8 @@
 from typing import Iterable
-from .OrderedSet import OrderedSet
+from .data.OrderedSet import OrderedSet
 
 
-class Queue:
+class QueueClass:
     def __init__(self, logger):
         self.__queue = OrderedSet(logger)
         self.__latest_order_number = 1
