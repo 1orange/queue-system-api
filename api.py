@@ -7,11 +7,14 @@ from assets.api.endpoints.Client import ClientEndpoint
 from assets.api.endpoints.Status import StatusEndpoint
 
 from flask import Flask
+from flask_cors import CORS
 from flask_restful import Api
 from flask_apispec.extension import FlaskApiSpec
 
 app = Flask(__name__)
 api = Api(app)
+
+CORS(app)
 
 app.config.update({
     'APISPEC_SPEC': APISpec(
