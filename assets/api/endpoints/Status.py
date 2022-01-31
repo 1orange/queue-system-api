@@ -4,14 +4,14 @@ from marshmallow import Schema, fields
 
 from flask_restful import Resource
 
-from .Client import Client
+from .Client import ClientGETRequestModel
 
 from main import clients_queue
 
-class Queue(Schema):
+class QueueModel(Schema):
     queue_size = fields.Int()
     clients = fields.Nested(
-        Client(many=True)
+        ClientGETRequestModel(many=True)
     )
 
 class StatusEndpoint(MethodResource, Resource):
@@ -20,7 +20,7 @@ class StatusEndpoint(MethodResource, Resource):
         description='This endopoint is used to fetch current queue',
         tags=['Queue Status']
     )
-    @marshal_with(Queue)
+    @marshal_with(QueueModel)
     def get(self):
         clients = clients_queue.get_iterable()
 

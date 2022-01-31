@@ -1,17 +1,16 @@
-from main import logger
-
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 
 from assets.api.endpoints.Client import ClientEndpoint
 from assets.api.endpoints.Status import StatusEndpoint
+from assets.dashboard.dash import render_dashboard
 
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 from flask_apispec.extension import FlaskApiSpec
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='assets/dashboard/templates')
 api = Api(app)
 
 CORS(app)
@@ -24,10 +23,15 @@ app.config.update({
         openapi_version='2.0.0'
     ),
     'APISPEC_SWAGGER_URL': '/docs/json',  # URI to access API Doc JSON 
-    'APISPEC_SWAGGER_UI_URL': '/'  # URI to access UI of API Doc
+    'APISPEC_SWAGGER_UI_URL': '/docs'  # URI to access UI of API Doc
 })
 
 docs = FlaskApiSpec(app)
+
+# Register WEB routes
+@app.route('/')
+def index():
+    return render_dashboard()
 
 # Create endpoint route
 api.add_resource(ClientEndpoint, "/client")
