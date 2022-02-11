@@ -1,8 +1,8 @@
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 
-from assets.api.endpoints.Client import ClientEndpoint
-from assets.api.endpoints.Status import StatusEndpoint
+from assets.api.views.Client import ClientEndpoint
+from assets.api.views.Status import StatusEndpoint
 from assets.dashboard.dash import render_dashboard
 
 from flask import Flask
