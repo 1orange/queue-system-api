@@ -47,6 +47,15 @@ class OrderedSet:
 
     def get_size(self) -> int:
         return self.__size
+    
+    def find_by_id(self, id):
+        current_node = self.__head
+
+        while current_node:
+            if current_node.get_id() == id:
+                return current_node
+
+            current_node = current_node.get_next()
 
     def get_iterable(self):
         queue_entities = []
@@ -67,21 +76,3 @@ class OrderedSet:
             self.__logger.info(current_node)
 
             current_node = current_node.get_next()
-
-
-class Node():
-    def __init__(self):
-        self.__prev = None
-        self.__next = None
-
-    def set_prev(self, prev_node):
-        self.__prev = prev_node
-
-    def get_prev(self):
-        return self.__prev
-
-    def set_next(self, next_node):
-        self.__next = next_node
-
-    def get_next(self):
-        return self.__next

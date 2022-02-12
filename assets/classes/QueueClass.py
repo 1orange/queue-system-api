@@ -1,5 +1,4 @@
-from typing import Iterable
-from .data.OrderedSet import OrderedSet
+from .dto.OrderedSet import OrderedSet
 
 
 class QueueClass:
@@ -77,3 +76,6 @@ class QueueClass:
 
     def get_size(self):
         return self.__queue_size
+
+    def find_client_by_id(self, client_id):
+        return self.__queue.find_by_id(client_id)
