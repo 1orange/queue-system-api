@@ -1,0 +1,1 @@
+npx tailwindcss -i ./smart_queue/apps/dashboard/static/css/src/base.css -o ./smart_queue/apps/dashboard/static/css/main.css

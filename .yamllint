@@ -1,0 +1,4 @@
+extends: default
+rules:
+  line-length: disable  # It is real pain and our usage "prohibits" it :(.
+  document-start: disable

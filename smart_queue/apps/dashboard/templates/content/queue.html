@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Current Queue{% endblock %}
+
+{% block content %}
+
+<table class="border-collapse w-full h-16">
+  <thead>
+      <tr>
+          <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">ID</th>
+          <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Deleted entry</th>
+          <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Timestamp</th>
+          <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Batch_id</th>
+          <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Eraser</th>
+          <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"></th>
+      </tr>
+  </thead>
+  
+  <tbody>
+    {% for elem in entries %}
+            
+    <tr class="bg-white lg:hover:bg-gray-100 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
+            
+        <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
+            {{ elem.id }}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
+            {{ elem.value }}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+            {{ elem.created }}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+            {{ elem.batch_id }}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+            {{ elem.eraser_name }}
+        </td>
+        <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+            <a href="#" class="text-blue-400 hover:text-blue-600 underline">Revert</a>
+        </td>
+    </tr>      
+
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

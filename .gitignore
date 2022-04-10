@@ -8,6 +8,8 @@
 
 # .lock files
 *.lock
+config.yaml
+.vscode/
 
 # User-specific stuff
 .idea/**/workspace.xml

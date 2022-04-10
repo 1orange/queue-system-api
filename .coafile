@@ -1,0 +1,13 @@
+[Default]
+ignore = ./.cache/**, ./.venv/**, ./node_modules/**
+
+[yaml-lint]
+bears = YAMLLintBear
+files = **.yml, **.yaml
+yamllint_config = .yamllint
+ignore = ./.cache/**, ./.venv/**, ./node_modules/**
+
+[all.rst.RSTcheckBear]
+bears = RSTcheckBear
+files = **.rst
+ignore = ./.cache/**, ./.venv/**, ./node_modules/**

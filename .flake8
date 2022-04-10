@@ -1,0 +1,20 @@
+[flake8]
+ignore =
+    W503,  # line break before binary operator (conflict with black...)
+    E501,
+    W605,
+    W505
+
+exclude =
+
+count = True
+statistics = True
+
+doctests = True
+show-source = True
+
+# default 79 is sometimes too restrictive. Also we have black which formats
+# most of the long lines. Additionally, we have "less strict/better" pylint.
+max-line-length = 99
+
+max-doc-length = 99
