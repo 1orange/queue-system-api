@@ -6,6 +6,7 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from smart_queue.apps.client.views import ClientEndpoint
+from smart_queue.apps.conditions.views import ConditionEndpoint
 from smart_queue.apps.dashboard import static_path, templates_path
 from smart_queue.apps.dashboard.routes import Dash
 from smart_queue.apps.queue.views import QueueEndpoint
@@ -41,10 +42,12 @@ app.register_blueprint(Dash)
 # Endpoints
 api.add_resource(ClientEndpoint, "/client")
 api.add_resource(QueueEndpoint, "/queue")
+api.add_resource(ConditionEndpoint, "/conditions")
 
 # Add endpoints to swagger
 docs.register(ClientEndpoint)
 docs.register(QueueEndpoint)
+docs.register(ConditionEndpoint)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

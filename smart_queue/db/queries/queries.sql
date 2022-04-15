@@ -33,3 +33,13 @@ SELECT uuid,
  ORDER 
     BY priority DESC,
        arrived ASC;
+
+-- name: get_all_conditions
+SELECT id,
+       name,
+       description
+  FROM sq.conditions;
+
+-- name: insert_condition!
+INSERT INTO sq.conditions(name, description)
+     VALUES (:name, :desc);

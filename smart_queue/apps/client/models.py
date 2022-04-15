@@ -12,10 +12,6 @@ class ClientPOSTRequestModel(Schema):
     condition_id = fields.Int()
 
 
-class InvalidResponseModel(Schema):
-    detail = fields.Str()
-
-
 class QueueModel(Schema):
     queue_size = fields.Int()
     clients = fields.Nested(ClientGETRequestModel(many=True))

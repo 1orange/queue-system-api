@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS sq.conditions (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
+    -- complexity NOTE: TIME COMPLEXITY OF act
 
     UNIQUE(name)
 );
