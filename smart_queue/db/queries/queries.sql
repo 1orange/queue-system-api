@@ -20,6 +20,17 @@ SELECT uuid,
     BY priority DESC,
        arrived ASC;
 
+-- name: delete_current_client!
+DELETE FROM sq.queue
+ WHERE uuid = (
+      SELECT uuid
+        FROM sq.queue
+       ORDER 
+             BY priority DESC,
+             arrived ASC
+       LIMIT 1
+ );
+
 --name: get_queue_status
 SELECT uuid, 
        arrived, 
@@ -30,16 +41,35 @@ SELECT uuid,
        sq.conditions AS C 
        ON 
        Q.condition_id = C.id
+ WHERE uuid
+       NOT IN (
+               SELECT uuid
+                FROM sq.queue
+               ORDER
+                  BY priority DESC
+               LIMIT 1
+              )
  ORDER 
     BY priority DESC,
-       arrived ASC;
+       arrived ASC
+ LIMIT 5;
 
 -- name: get_all_conditions
 SELECT id,
        name,
-       description
+       description,
+       complexity
   FROM sq.conditions;
 
 -- name: insert_condition!
-INSERT INTO sq.conditions(name, description)
-     VALUES (:name, :desc);
+INSERT INTO sq.conditions(name, description, complexity)
+     VALUES (:name, :desc, :complexity);
+
+--name: delete_condition!
+DELETE FROM sq.conditions
+ WHERE id = :id;
+
+-- name: find_client_by_id^
+SELECT count(*) as count
+  FROM sq.queue
+ WHERE uuid = :uuid;

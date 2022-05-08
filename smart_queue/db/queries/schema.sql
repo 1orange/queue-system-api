@@ -1,7 +1,7 @@
 -- name: initialize_db#
 CREATE SCHEMA IF NOT EXISTS sq;
 
-CREATE SEQUENCE sq.order_number_seq
+CREATE SEQUENCE IF NOT EXISTS sq.order_number_seq
 MINVALUE 1
 INCREMENT 1
 START 1;
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS sq.conditions (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
-    -- complexity NOTE: TIME COMPLEXITY OF act
+    complexity INTEGER NOT NULL DEFAULT 10,
 
     UNIQUE(name)
 );

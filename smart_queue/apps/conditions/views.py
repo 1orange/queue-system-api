@@ -1,4 +1,3 @@
-from email.mime import application
 from http import HTTPStatus
 
 from flask import Response, json, request
@@ -12,7 +11,7 @@ from smart_queue.apps.conditions.models import (
     ConditionGETResponse,
     ConditionPOSTRequestModel,
 )
-from smart_queue.db.database import get_all_conditions, insert_condition
+from smart_queue.db.database import get_all_conditions, insert_condition, delete_condition
 
 
 class ConditionEndpoint(MethodResource, Resource):
@@ -63,6 +62,7 @@ class ConditionEndpoint(MethodResource, Resource):
         try:
             name = None
             desc = None
+            complexity = None
 
             if "name" in request.json:
                 name = request.json["name"]
@@ -70,8 +70,41 @@ class ConditionEndpoint(MethodResource, Resource):
             if "description" in request.json:
                 desc = request.json["description"]
 
+            if "complexity" in request.json:
+                complexity = request.json["complexity"]
+
             # Add condition
-            insert_condition(name, desc)
+            insert_condition(name=name, desc=desc, complexity=complexity)
+
+        except KeyError:
+            return Response(
+                response=json.dumps({"info": "Wrong JSON format."}),
+                status=HTTPStatus.BAD_REQUEST,
+                mimetype="application/json",
+            )
+    
+    @doc(description="Endpoint used for conditions", tags=["Condition"])
+    # @use_kwargs(ConditionPOSTRequestModel)
+    @marshal_with(ConditionPOSTRequestModel, code=201)
+    @marshal_with(InvalidResponseModel, code=400)
+    @marshal_with(InvalidResponseModel, code=404)
+    @marshal_with(InvalidResponseModel, code=422)
+    @marshal_with(InvalidResponseModel, code=500)
+    def delete(self):
+        """
+        Delete Method - Insert new condition
+        """
+
+        # NOTE: Add JSON validation
+
+        try:
+            id = None
+
+            if "id" in request.json:
+                id = request.json["id"]
+
+            # Add condition
+            delete_condition(id=id)
 
         except KeyError:
             return Response(

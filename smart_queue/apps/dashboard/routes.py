@@ -1,8 +1,34 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template, request
+
+from smart_queue.db.database import get_all_conditions, get_current_client, get_queue_status, insert_condition, next_patient
 
 Dash = Blueprint("dash", __name__)
 
 
-@Dash.route("/")
+@Dash.route("/", methods=['POST', 'GET'])
 def index():
-    return render_template("base.html")
+    if request.method == "POST":
+        next_patient()
+    
+    return render_template(
+        "base.html",
+        queue = get_queue_status(),
+        current_patient = get_current_client(),
+        conditions = get_all_conditions()
+    )
+
+@Dash.route("/conditions/add", methods=['POST', 'GET'])
+def condition_add_form():
+    if request.method == "GET":
+        return redirect("/")
+
+    desc = None
+    name = request.form["name"]
+    complexity = request.form["complexity"]
+
+    if request.form["desc"]:
+        desc = request.form["desc"]
+
+    insert_condition(name=name, desc=desc, complexity=complexity)
+
+    return redirect("/")
