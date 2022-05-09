@@ -16,10 +16,10 @@ def evaluate_client_priority(time_arrived, burst_time, urgency) -> int:
 
     duration = pendulum.now() - time_arrived
 
-    # normalize elapsed_time
-    elapsed_time = duration.seconds, 5
+    # # normalize elapsed_time
+    # elapsed_time = duration.seconds
 
-    return (elapsed_time * urgency) / burst_time
+    return (duration.seconds * urgency) / burst_time
 
 
 def reevaluate_queue():
