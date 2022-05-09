@@ -84,9 +84,10 @@ def insert_client(condition_id: int) -> NamedTuple:
     with psycopg2.connect(
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
-        sql.insert_client(pg, condition_id=condition_id)
+        resp = sql.insert_client(pg, condition_id=condition_id)
         reevaluate_queue()
 
+        return resp
 
 def insert_condition(
     name: str, complexity: int, desc: Optional[str] = None
