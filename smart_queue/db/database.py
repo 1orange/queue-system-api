@@ -83,7 +83,8 @@ def insert_client(condition_id: int) -> NamedTuple:
     with psycopg2.connect(
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
-        return sql.insert_client(pg, condition_id=condition_id)
+        sql.insert_client(pg, condition_id=condition_id)
+        reevaluate_queue()
 
 
 def insert_condition(
@@ -142,5 +143,6 @@ def next_patient():
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
         sql.delete_current_client(pg)
+        reevaluate_queue()
 
         return
