@@ -30,11 +30,17 @@ DELETE FROM sq.queue
              arrived ASC
        LIMIT 1
  );
+ 
+-- name: reevaluate_queue*!
+UPDATE 
+   SET priority = :priority
+ WHERE uuid = :uuid;
 
 --name: get_queue_status
 SELECT uuid, 
        arrived, 
        name as condition_name,
+       complexity
        order_number
   FROM sq.queue AS Q 
        JOIN 

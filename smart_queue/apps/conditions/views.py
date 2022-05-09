@@ -11,7 +11,11 @@ from smart_queue.apps.conditions.models import (
     ConditionGETResponse,
     ConditionPOSTRequestModel,
 )
-from smart_queue.db.database import get_all_conditions, insert_condition, delete_condition
+from smart_queue.db.database import (
+    delete_condition,
+    get_all_conditions,
+    insert_condition,
+)
 
 
 class ConditionEndpoint(MethodResource, Resource):
@@ -82,7 +86,7 @@ class ConditionEndpoint(MethodResource, Resource):
                 status=HTTPStatus.BAD_REQUEST,
                 mimetype="application/json",
             )
-    
+
     @doc(description="Endpoint used for conditions", tags=["Condition"])
     # @use_kwargs(ConditionPOSTRequestModel)
     @marshal_with(ConditionPOSTRequestModel, code=201)

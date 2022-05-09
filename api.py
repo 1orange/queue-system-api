@@ -24,7 +24,7 @@ CORS(app)
 @app.after_request
 def after_request(response):
     header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
+    header["Access-Control-Allow-Origin"] = "*"
     # Other headers can be added here if needed
     return response
 
@@ -59,4 +59,3 @@ docs.register(ConditionEndpoint)
 
 if __name__ == "__main__":
     app.run(port=5000, host="0.0.0.0")
-

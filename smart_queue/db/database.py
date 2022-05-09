@@ -1,13 +1,47 @@
+from asyncio.log import logger
+from collections import namedtuple
 from tokenize import Name
 from typing import List, NamedTuple, Optional
-import pendulum
 
+import pendulum
 import psycopg2
-from collections import namedtuple
 from psycopg2.extras import NamedTupleCursor
 
 from smart_queue import config
 from smart_queue.db import sql
+from smart_queue.db.helpers.autocommit import one_transaction_ctx
+
+
+def evaluate_client_priority(time_arrived, complexity) -> int:
+    # NOTE: Evaluate alghoritm
+
+    return round(pendulum.now() - time_arrived) * complexity
+
+
+def reevaluate_queue():
+    with psycopg2.connect(
+        **config.database, cursor_factory=NamedTupleCursor
+    ) as pg:
+        with one_transaction_ctx(pg):
+            try:
+                evaluated_clients = [
+                    {
+                        "uuid": client.uuid,
+                        "priority": evaluate_client_priority(
+                            time_arrive=pendulum.instance(client.arrived),
+                            complexity=client.complexity,
+                        ),
+                    }
+                    for client in sql.get_queue_status(pg)
+                ]
+
+                sql.reevaluate_queue(pg, evaluated_clients)
+
+            except Exception as e:
+                logger.info(f"Unhandled exception:/r/n{e}")
+                pg.rollback()
+
+        return
 
 
 def check_client_status(uuid) -> str:
@@ -29,19 +63,18 @@ def get_current_client() -> NamedTuple:
     with psycopg2.connect(
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
-        fetched_client =  sql.get_current_client(pg)
+        fetched_client = sql.get_current_client(pg)
 
         if fetched_client:
             current_client = namedtuple(
-                'Client',
-                ['uuid', 'order_number', 'arrived', 'condition_name']
+                "Client", ["uuid", "order_number", "arrived", "condition_name"]
             )
 
             return current_client(
                 fetched_client.uuid,
                 fetched_client.order_number,
                 pendulum.instance(fetched_client.arrived).to_time_string(),
-                fetched_client.condition_name
+                fetched_client.condition_name,
             )
 
 
@@ -60,7 +93,7 @@ def insert_condition(
     with psycopg2.connect(
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
-        sql.insert_condition(pg, name=name, desc=desc, complexity=complexity)
+        sql.insert_condition(pg, name=name, desc=desc, complesxity=complexity)
 
 
 def delete_condition(id) -> None:
@@ -77,12 +110,10 @@ def get_queue_status() -> NamedTuple:
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
         client = namedtuple(
-            'Client',
-            ['uuid', 'order_number', 'arrived', 'condition_name']
+            "Client", ["uuid", "order_number", "arrived", "condition_name"]
         )
 
         clients = []
-
 
         for fetched_client in sql.get_queue_status(pg):
             clients.append(
@@ -90,7 +121,7 @@ def get_queue_status() -> NamedTuple:
                     fetched_client.uuid,
                     fetched_client.order_number,
                     pendulum.instance(fetched_client.arrived).to_time_string(),
-                    fetched_client.condition_name
+                    fetched_client.condition_name,
                 )
             )
 
@@ -113,4 +144,3 @@ def next_patient():
         sql.delete_current_client(pg)
 
         return
-    
