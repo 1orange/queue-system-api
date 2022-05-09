@@ -25,6 +25,7 @@ CORS(app)
 def after_request(response):
     header = response.headers
     header['Access-Control-Allow-Origin'] = '*'
+    header['origins'] = '*'
     # Other headers can be added here if needed
     return response
 
