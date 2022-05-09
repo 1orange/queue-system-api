@@ -1,11 +1,11 @@
 // Check queue
 setInterval( function() {
-    $('div#queue').load('http://localhost:5000 #queue');
+    $('div#queue').load(location.href + "#queue");
 }, 30000); // each 30 sec
 
 // Check patient
 setInterval( function() {
-    $('div#patient').load('http://localhost:5000 #patient');
+    $('div#patient').load(location.href + "#patient");
 }, 30000); // each 30 sec
 
 
