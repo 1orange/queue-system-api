@@ -15,7 +15,10 @@ from smart_queue.db.helpers.autocommit import one_transaction_ctx
 def evaluate_client_priority(time_arrived, complexity) -> int:
     # NOTE: Evaluate alghoritm
 
-    return round(pendulum.now() - time_arrived) * complexity
+    elapsed_time = pendulum.now() - time_arrived
+
+
+    return elapsed_time.minutes * complexity
 
 
 def reevaluate_queue():
