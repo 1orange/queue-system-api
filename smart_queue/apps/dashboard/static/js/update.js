@@ -1,13 +1,21 @@
 // Check queue
 setInterval( function() {
-    $('div#queue-content').empty();
-    $('div#queue').load(location.href + " #queue-content");
+    if(document.getElementById("no-queue-content") !== null)
+    {
+        $('div#no-queue-content').empty();
+        $('div#no-queue-content').load(location.href + " #queue-content");
+        $('div#no-queue-content').attr("id", "queue-content")    
+    }
 }, 30000); // each 30 sec
 
 // Check patient
 setInterval( function() {
-    $('div#patient-content').empty();
-    $('div#patient').load(location.href + " #patient-content");
+    if(document.getElementById("no-patient-content") !== null)
+    {
+        $('div#no-patient-content').empty();
+        $('div#no-patient-content').load(location.href + " #patient-content");
+        $('div#no-patient-content').attr("id", "patient-content")    
+    }
 }, 30000); // each 30 sec
 
 

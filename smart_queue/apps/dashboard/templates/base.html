@@ -18,7 +18,11 @@
             <!-- Up container -->
             <div class="flex h-1/2 w-full max-h-full place-content-center text-center items-center justify-center">
                 <div id="patient" class="my-5 bg-white font-semibold text-center rounded-3xl border shadow-lg p-10 max-w-xs">
+                    {% if current_patient %}
                     <div id="patient-content">
+                    {% else %}
+                    <div id="no-patient-content">
+                        
                         {% if current_patient %}
                         <p class="text-7xl">
                             {{ current_patient.order_number }}
@@ -42,9 +46,10 @@
                         <p class="text-3xl">
                             No patient waiting.
                         </p>
-
                         {% endif %}
+
                     </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -136,7 +141,14 @@
 
         <!-- Right container -->
         <div id="queue" class="w-1/2 h-screen text-center bg-gray-300">
+            {% if queue %}
             <div id="queue-content">
+            {% else %}
+            <div id="no-queue-content">
+            {% endfor %}
+
+
+            
                 <h1 class="font-bold my-8 text-5xl">
                     CURRENT QUEUE
                 </h1>
