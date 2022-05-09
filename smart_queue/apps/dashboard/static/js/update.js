@@ -1,12 +1,12 @@
 // Check queue
 setInterval( function() {
-    if(document.getElementById("no-queue-content") !== null)
-    {
-        $('div#queue-tmp').load(location.href + " #queue-content");
+    console.log("Queue fetch");
 
-        $('div#queue-content').remove();
-        $('div#queue-tmp').attr("id", "queue-content");
-    }
+    $('div#queue-tmp').load(location.href + " #queue-content");
+    $('div#queue-tmp').removeClass("hidden");
+    $('div#queue-content').remove();
+    $('div#queue-tmp').attr("id", "queue-content");
+
 }, 30000); // each 30 sec
 
 // Check patient
