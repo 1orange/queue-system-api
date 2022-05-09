@@ -1,6 +1,5 @@
 from asyncio.log import logger
 from collections import namedtuple
-from tokenize import Name
 from typing import List, NamedTuple, Optional
 
 import pendulum
@@ -15,10 +14,12 @@ from smart_queue.db.helpers.autocommit import one_transaction_ctx
 def evaluate_client_priority(time_arrived, complexity) -> int:
     # NOTE: Evaluate alghoritm
 
-    elapsed_time = pendulum.now() - time_arrived
+    duration = pendulum.now() - time_arrived
 
+    # normalize elapsed_time
+    elapsed_time = round((duration.seconds / 60), 5)
 
-    return elapsed_time.minutes * complexity
+    return elapsed_time * complexity
 
 
 def reevaluate_queue():
