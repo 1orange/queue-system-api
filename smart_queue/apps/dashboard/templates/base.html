@@ -140,56 +140,55 @@
         </div>
 
         <!-- Right container -->
-        <div id="queue" class="w-1/2 h-screen text-center bg-gray-300">
+        <div id="queue-wrapper" class="w-1/2 h-screen text-center bg-gray-300">
             <h1 class="font-bold my-8 text-5xl">
                 CURRENT QUEUE
             </h1>
 
-            {% if queue %}
-            <div id="queue-content">
-            {% else %}
-            <div id="no-queue-content">
-            {% endif %}
+            <div id="queue">
+                
+                <div class="queue-content">
+                    <div class="flex flex-col gap-4 items-center">
+                        {% for elem in queue %}
 
-                <div class="flex flex-col gap-4 items-center">
-                    {% for elem in queue %}
+                        <div class="border-2 border-b-4 border-gray-200 rounded-xl hover:bg-gray-50 bg-white">
 
-                    <div class="border-2 border-b-4 border-gray-200 rounded-xl hover:bg-gray-50 bg-white">
+                            <div class="grid grid-cols-6 p-5 gap-y-2">
 
-                        <div class="grid grid-cols-6 p-5 gap-y-2">
+                                <!-- Order number -->
+                                <div class="">
+                                    <p
+                                        class="text-white text-5xl bg-sky-500 w-16 h-16 rounded-full flex justify-center items-center text-center align-middle">
+                                        {{ elem.order_number }}
+                                    </p>
+                                </div>
 
-                            <!-- Order number -->
-                            <div class="">
-                                <p
-                                    class="text-white text-5xl bg-sky-500 w-16 h-16 rounded-full flex justify-center items-center text-center align-middle">
-                                    {{ elem.order_number }}
-                                </p>
-                            </div>
+                                <!-- Description -->
+                                <div class="col-span-5 md:col-span-4 ml-4">
 
-                            <!-- Description -->
-                            <div class="col-span-5 md:col-span-4 ml-4">
+                                    <!-- <p class="text-sky-500 font-bold text-xs"> 7+ SPOTS LEFT </p> -->
 
-                                <!-- <p class="text-sky-500 font-bold text-xs"> 7+ SPOTS LEFT </p> -->
+                                    <p class="text-gray-600 font-bold"> {{ elem.condition_name }} </p>
 
-                                <p class="text-gray-600 font-bold"> {{ elem.condition_name }} </p>
+                                    <p class="text-gray-400"> {{ elem.arrived }} </p>
 
-                                <p class="text-gray-400"> {{ elem.arrived }} </p>
+                                </div>
 
-                            </div>
+                                <!-- patient type -->
+                                <div class="flex col-start-2 ml-4 md:col-start-auto md:ml-0 md:justify-end">
+                                    <p class="rounded-lg text-red-500 font-bold bg-red-100 py-1 px-3 text-xs w-fit h-fit"> NEW
+                                    </p>
+                                </div>
 
-                            <!-- patient type -->
-                            <div class="flex col-start-2 ml-4 md:col-start-auto md:ml-0 md:justify-end">
-                                <p class="rounded-lg text-red-500 font-bold bg-red-100 py-1 px-3 text-xs w-fit h-fit"> NEW
-                                </p>
                             </div>
 
                         </div>
 
+                        {% endfor %}
                     </div>
-
-                    {% endfor %}
                 </div>
             </div>
+            
             <div id="queue-tmp" class="hidden"></div>
         </div>
     </div>
