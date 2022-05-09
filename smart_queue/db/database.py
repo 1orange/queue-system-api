@@ -67,7 +67,7 @@ def get_current_client() -> NamedTuple:
 
         if fetched_client:
             current_client = namedtuple(
-                "Client", ["uuid", "order_number", "arrived", "condition_name"]
+                "Client", ["uuid", "order_number", "arrived", "condition_name", "priority"]
             )
 
             return current_client(
@@ -75,6 +75,7 @@ def get_current_client() -> NamedTuple:
                 fetched_client.order_number,
                 pendulum.instance(fetched_client.arrived).to_time_string(),
                 fetched_client.condition_name,
+                fetched_client.priority
             )
 
 
@@ -111,7 +112,7 @@ def get_queue_status() -> NamedTuple:
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
         client = namedtuple(
-            "Client", ["uuid", "order_number", "arrived", "condition_name"]
+            "Client", ["uuid", "order_number", "arrived", "condition_name", "priority"]
         )
 
         clients = []
@@ -123,6 +124,7 @@ def get_queue_status() -> NamedTuple:
                     fetched_client.order_number,
                     pendulum.instance(fetched_client.arrived).to_time_string(),
                     fetched_client.condition_name,
+                    fetched_client.priority
                 )
             )
 
