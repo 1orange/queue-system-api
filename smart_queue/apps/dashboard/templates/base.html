@@ -34,6 +34,10 @@
                         </h3>
 
                         <p class="text-xs text-gray-400 mt-4">
+                            {{ current_patient.priority }}
+                        </p>
+
+                        <p class="text-xs text-gray-400 mt-4">
                             {{ current_patient.uuid }}
                         </p>
                         
@@ -175,7 +179,7 @@
 
                                 <!-- patient type -->
                                 <div class="flex col-start-2 ml-4 md:col-start-auto md:ml-0 md:justify-end">
-                                    <p class="rounded-lg text-red-500 font-bold bg-red-100 py-1 px-3 text-xs w-fit h-fit"> NEW
+                                    <p class="rounded-lg text-red-500 font-bold bg-red-100 py-1 px-3 text-xs w-fit h-fit"> {{ elem.priority }}
                                     </p>
                                 </div>
 

@@ -10,7 +10,8 @@ INSERT INTO sq.queue(condition_id)
 SELECT uuid, 
        arrived, 
        name as condition_name,
-       order_number
+       order_number,
+       priority
   FROM sq.queue AS Q 
        JOIN 
        sq.conditions AS C 
@@ -40,7 +41,8 @@ UPDATE
 SELECT uuid, 
        arrived, 
        name as condition_name,
-       complexity
+       complexity,
+       priority,
        order_number
   FROM sq.queue AS Q 
        JOIN 
