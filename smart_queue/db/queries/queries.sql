@@ -68,7 +68,7 @@ SELECT id,
        name,
        description,
        burst_time,
-       urgency,
+       urgency
   FROM sq.conditions;
 
 -- name: insert_condition!
