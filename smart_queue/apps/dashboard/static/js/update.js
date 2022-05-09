@@ -2,30 +2,19 @@
 setInterval( function() {
     console.log("Queue fetch");
 
-    // var contnet = $('div#queue-tmp').load(location.href + " #queue-content");
-    // $('div#queue-tmp').removeClass("hidden");
-    // $('div#queue-content').remove();
-    // $('div#queue-tmp').attr("id", "queue-content");
-
-    var tmp;
     $.ajax({
         url:location.href,
         type:'GET',
         success: function(data) {
-            tmp = $('<div id="queue-tmp" class="hidden">').append(data).find('#queue-content');
+            console.log("Loading");
+            var tmp = $('<div>').append(data).find('#queue-content').attr("id", "queue-tmp");
+            
+            $(tmp).appendTo('div#queue');
+
+            $('div#queue-content').remove();
+            $('div#queue-tmp').attr("id", "queue-content");
         }
     });
-
-    if (!(tmp === undefined || tmp === null)) {
-        console.log("Loading");
-        console.log(tmp);
-
-        $('div#queue-tmp').load(tmp);
-        $('div#queue-tmp').removeClass("hidden");
-
-        $('div#queue-content').remove();
-        $('div#queue-tmp').attr("id", "queue-content");
-    }
 
 }, 30000); // each 30 sec
 
