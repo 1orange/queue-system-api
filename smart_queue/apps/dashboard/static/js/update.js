@@ -17,6 +17,9 @@ setInterval( function() {
     });
 
     if (!(tmp === undefined || tmp === null)) {
+        console.log("Loading");
+        console.log(tmp);
+
         $('div#queue-tmp').load(tmp);
         $('div#queue-tmp').removeClass("hidden");
 
