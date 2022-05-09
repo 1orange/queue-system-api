@@ -18,32 +18,33 @@
             <!-- Up container -->
             <div class="flex h-1/2 w-full max-h-full place-content-center text-center items-center justify-center">
                 <div id="patient" class="my-5 bg-white font-semibold text-center rounded-3xl border shadow-lg p-10 max-w-xs">
-                    {% if current_patient %}
-                    <p class="text-7xl">
-                        {{ current_patient.order_number }}
-                    </p>
+                    <div id="patient-content"></div>
+                        {% if current_patient %}
+                        <p class="text-7xl">
+                            {{ current_patient.order_number }}
+                        </p>
 
-                    <h1 class="text-lg text-gray-700"> {{ current_patient.condition_name }} </h1>
+                        <h1 class="text-lg text-gray-700"> {{ current_patient.condition_name }} </h1>
 
-                    <h3 class="text-sm text-gray-400 "> {{ current_patient.arrived }} </h3>
+                        <h3 class="text-sm text-gray-400 "> {{ current_patient.arrived }} </h3>
 
-                    <p class="text-xs text-gray-400 mt-4"> {{ current_patient.uuid }} </p>
-                    
-                    
-                    <form  method = "post">
-                        <button class="bg-indigo-600 px-8 py-2 mt-8 rounded-3xl text-gray-100 font-semibold uppercase">
-                            Next patient
-                        </button>
-                    </form>
+                        <p class="text-xs text-gray-400 mt-4"> {{ current_patient.uuid }} </p>
+                        
+                        
+                        <form  method = "post">
+                            <button class="bg-indigo-600 px-8 py-2 mt-8 rounded-3xl text-gray-100 font-semibold uppercase">
+                                Next patient
+                            </button>
+                        </form>
 
-                    {% else %}
+                        {% else %}
 
-                    <p class="text-3xl">
-                        No patient waiting.
-                    </p>
+                        <p class="text-3xl">
+                            No patient waiting.
+                        </p>
 
-                   {% endif %}
-
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
@@ -135,49 +136,50 @@
 
         <!-- Right container -->
         <div id="queue" class="w-1/2 h-screen text-center bg-gray-300">
-            <h1 class="font-bold my-8 text-5xl">
-                CURRENT QUEUE
-            </h1>
+            <div id="queue-content">
+                <h1 class="font-bold my-8 text-5xl">
+                    CURRENT QUEUE
+                </h1>
 
-            <div class="flex flex-col gap-4 items-center">
-                {% for elem in queue %}
+                <div class="flex flex-col gap-4 items-center">
+                    {% for elem in queue %}
 
-                <div class="border-2 border-b-4 border-gray-200 rounded-xl hover:bg-gray-50 bg-white">
+                    <div class="border-2 border-b-4 border-gray-200 rounded-xl hover:bg-gray-50 bg-white">
 
-                    <div class="grid grid-cols-6 p-5 gap-y-2">
+                        <div class="grid grid-cols-6 p-5 gap-y-2">
 
-                        <!-- Order number -->
-                        <div class="">
-                            <p
-                                class="text-white text-5xl bg-sky-500 w-16 h-16 rounded-full flex justify-center items-center text-center align-middle">
-                                {{ elem.order_number }}
-                            </p>
-                        </div>
+                            <!-- Order number -->
+                            <div class="">
+                                <p
+                                    class="text-white text-5xl bg-sky-500 w-16 h-16 rounded-full flex justify-center items-center text-center align-middle">
+                                    {{ elem.order_number }}
+                                </p>
+                            </div>
 
-                        <!-- Description -->
-                        <div class="col-span-5 md:col-span-4 ml-4">
+                            <!-- Description -->
+                            <div class="col-span-5 md:col-span-4 ml-4">
 
-                            <!-- <p class="text-sky-500 font-bold text-xs"> 7+ SPOTS LEFT </p> -->
+                                <!-- <p class="text-sky-500 font-bold text-xs"> 7+ SPOTS LEFT </p> -->
 
-                            <p class="text-gray-600 font-bold"> {{ elem.condition_name }} </p>
+                                <p class="text-gray-600 font-bold"> {{ elem.condition_name }} </p>
 
-                            <p class="text-gray-400"> {{ elem.arrived }} </p>
+                                <p class="text-gray-400"> {{ elem.arrived }} </p>
 
-                        </div>
+                            </div>
 
-                        <!-- patient type -->
-                        <div class="flex col-start-2 ml-4 md:col-start-auto md:ml-0 md:justify-end">
-                            <p class="rounded-lg text-red-500 font-bold bg-red-100 py-1 px-3 text-xs w-fit h-fit"> NEW
-                            </p>
+                            <!-- patient type -->
+                            <div class="flex col-start-2 ml-4 md:col-start-auto md:ml-0 md:justify-end">
+                                <p class="rounded-lg text-red-500 font-bold bg-red-100 py-1 px-3 text-xs w-fit h-fit"> NEW
+                                </p>
+                            </div>
+
                         </div>
 
                     </div>
 
+                    {% endfor %}
                 </div>
-
-                {% endfor %}
             </div>
-
         </div>
     </div>
 
