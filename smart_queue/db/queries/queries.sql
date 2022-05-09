@@ -33,7 +33,7 @@ DELETE FROM sq.queue
  );
  
 -- name: reevaluate_queue*!
-UPDATE 
+UPDATE sq.queue
    SET priority = :priority
  WHERE uuid = :uuid;
 
