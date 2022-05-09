@@ -141,17 +141,15 @@
 
         <!-- Right container -->
         <div id="queue" class="w-1/2 h-screen text-center bg-gray-300">
+            <h1 class="font-bold my-8 text-5xl">
+                CURRENT QUEUE
+            </h1>
+
             {% if queue %}
             <div id="queue-content">
             {% else %}
             <div id="no-queue-content">
             {% endif %}
-
-
-            
-                <h1 class="font-bold my-8 text-5xl">
-                    CURRENT QUEUE
-                </h1>
 
                 <div class="flex flex-col gap-4 items-center">
                     {% for elem in queue %}
@@ -192,6 +190,7 @@
                     {% endfor %}
                 </div>
             </div>
+            <div id="queue-tmp" class="hidden"></div>
         </div>
     </div>
 
