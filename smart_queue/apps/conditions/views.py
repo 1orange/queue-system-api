@@ -66,7 +66,8 @@ class ConditionEndpoint(MethodResource, Resource):
         try:
             name = None
             desc = None
-            complexity = None
+            burst_time = None
+            urgency = None
 
             if "name" in request.json:
                 name = request.json["name"]
@@ -74,11 +75,14 @@ class ConditionEndpoint(MethodResource, Resource):
             if "description" in request.json:
                 desc = request.json["description"]
 
-            if "complexity" in request.json:
-                complexity = request.json["complexity"]
+            if "burst_time" in request.json:
+                burst_time = request.json["burst_time"]
+            
+            if "urgency" in request.json:
+                urgency = request.json["urgency"]
 
             # Add condition
-            insert_condition(name=name, desc=desc, complexity=complexity)
+            insert_condition(name=name, desc=desc, burst_time=burst_time)
 
         except KeyError:
             return Response(

@@ -11,7 +11,7 @@ from smart_queue.db import sql
 from smart_queue.db.helpers.autocommit import one_transaction_ctx
 
 
-def evaluate_client_priority(time_arrived, complexity) -> int:
+def evaluate_client_priority(time_arrived, burst_time, urgency) -> int:
     # NOTE: Evaluate alghoritm
 
     duration = pendulum.now() - time_arrived
@@ -19,7 +19,7 @@ def evaluate_client_priority(time_arrived, complexity) -> int:
     # normalize elapsed_time
     elapsed_time = round((duration.seconds / 60), 5)
 
-    return elapsed_time * complexity
+    return (elapsed_time * urgency) / burst_time
 
 
 def reevaluate_queue():
@@ -33,7 +33,8 @@ def reevaluate_queue():
                         "uuid": client.uuid,
                         "priority": evaluate_client_priority(
                             time_arrived=pendulum.instance(client.arrived),
-                            complexity=client.complexity,
+                            burst_time=client.burst_time,
+                            urgency=client.urgency
                         ),
                     }
                     for client in sql.get_queue_status(pg)
@@ -42,7 +43,7 @@ def reevaluate_queue():
                 sql.reevaluate_queue(pg, evaluated_clients)
 
             except Exception as e:
-                logger.info(f"Unhandled exception:/r/n{e}")
+                logger.info(f"Unhandled exception:\r\n{e}")
                 pg.rollback()
 
         return
@@ -94,13 +95,13 @@ def insert_client(condition_id: int) -> NamedTuple:
         return resp
 
 def insert_condition(
-    name: str, complexity: int, desc: Optional[str] = None
+    name: str, burst_time: int, desc: Optional[str] = None, urgency: int = 1
 ) -> None:
     # pylint: disable=E1101
     with psycopg2.connect(
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
-        sql.insert_condition(pg, name=name, desc=desc, complesxity=complexity)
+        sql.insert_condition(pg, name=name, desc=desc, burst_time=burst_time, urgency=urgency)
 
 
 def delete_condition(id) -> None:

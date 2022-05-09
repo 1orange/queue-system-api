@@ -41,7 +41,8 @@ UPDATE sq.queue
 SELECT uuid, 
        arrived, 
        name as condition_name,
-       complexity,
+       burst_time,
+       urgency,
        priority,
        order_number
   FROM sq.queue AS Q 
@@ -66,12 +67,13 @@ SELECT uuid,
 SELECT id,
        name,
        description,
-       complexity
+       burst_time,
+       urgency,
   FROM sq.conditions;
 
 -- name: insert_condition!
-INSERT INTO sq.conditions(name, description, complexity)
-     VALUES (:name, :desc, :complexity);
+INSERT INTO sq.conditions(name, description, burst_time, urgency)
+     VALUES (:name, :desc, :burst_time, :urgency);
 
 --name: delete_condition!
 DELETE FROM sq.conditions

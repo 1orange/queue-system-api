@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS sq.conditions (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
-    complexity INTEGER NOT NULL DEFAULT 10,
+    burst_time INTEGER NOT NULL DEFAULT 10,
+    urgency INTEGER NOT NULL DEFAULT 1,
 
     UNIQUE(name)
 );
