@@ -22,21 +22,10 @@ CORS(app)
 
 # CORS section
 @app.after_request
-def after_request_func(response):
-    origin = request.headers.get("Origin")
-    if request.method == "OPTIONS":
-        response = make_response()
-        response.headers.add("Access-Control-Allow-Credentials", "true")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        response.headers.add("Access-Control-Allow-Headers", "x-csrf-token")
-        response.headers.add("Access-Control-Allow-Methods", "GET, POST")
-        if origin:
-            response.headers.add("Access-Control-Allow-Origin", origin)
-    else:
-        response.headers.add("Access-Control-Allow-Credentials", "true")
-        if origin:
-            response.headers.add("Access-Control-Allow-Origin", origin)
-
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    # Other headers can be added here if needed
     return response
 
 
