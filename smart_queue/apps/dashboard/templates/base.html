@@ -18,23 +18,24 @@
             <!-- Up container -->
             <div class="flex h-1/2 w-full max-h-full place-content-center text-center items-center justify-center">
                 <div id="patient" class="my-5 bg-white font-semibold text-center rounded-3xl border shadow-lg p-10 max-w-xs">
-                    {% if current_patient %}
+                    
                     <div id="patient-content">
-                    {% else %}
-                    <div id="no-patient-content">
-                    {% endif %}
-
                         {% if current_patient %}
                         <p class="text-7xl">
                             {{ current_patient.order_number }}
                         </p>
 
-                        <h1 class="text-lg text-gray-700"> {{ current_patient.condition_name }} </h1>
+                        <h1 class="text-lg text-gray-700">
+                            {{ current_patient.condition_name }}
+                        </h1>
 
-                        <h3 class="text-sm text-gray-400 "> {{ current_patient.arrived }} </h3>
+                        <h3 class="text-sm text-gray-400 ">
+                            {{ current_patient.arrived }}
+                        </h3>
 
-                        <p class="text-xs text-gray-400 mt-4"> {{ current_patient.uuid }} </p>
-                        
+                        <p class="text-xs text-gray-400 mt-4">
+                            {{ current_patient.uuid }}
+                        </p>
                         
                         <form  method = "post">
                             <button class="bg-indigo-600 px-8 py-2 mt-8 rounded-3xl text-gray-100 font-semibold uppercase">
@@ -43,12 +44,10 @@
                         </form>
 
                         {% else %}
-
                         <p class="text-3xl">
                             No patient waiting.
                         </p>
                         {% endif %}
-
                     </div>
                 </div>
             </div>

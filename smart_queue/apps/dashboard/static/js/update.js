@@ -16,16 +16,23 @@ setInterval( function() {
         }
     });
 
-}, 30000); // each 30 sec
+}, 10000); // each 30 sec
 
 // Check patient
 setInterval( function() {
-    if(document.getElementById("no-patient-content") !== null)
-    {   
-        $('div#no-patient-content').empty();
-        $('div#no-patient-content').load(location.href + " #patient-content");
-        $('div#no-patient-content').attr("id", "patient-content")    
-    }
-}, 30000); // each 30 sec
+    $.ajax({
+        url:location.href,
+        type:'GET',
+        success: function(data) {
+            console.log("Loading");
+            var tmp = $('<div>').append(data).find('#patient-content').attr("id", "patient-tmp");
+            
+            $(tmp).appendTo('div#patient');
+
+            $('div#patient-content').remove();
+            $('div#patient-tmp').attr("id", "patient-content");
+        }
+    });
+}, 10000); // each 30 sec
 
 
