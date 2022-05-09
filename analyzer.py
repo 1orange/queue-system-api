@@ -23,7 +23,7 @@ def eval_priority_by_wait_time(elapsed_minutes):
 if __name__ == "__main__":
     result = eval_priority_by_wait_time(args.wait_time)
 
-    print(f"Result for {int(args.wait_time) * 60} seconds:")
+    print(f"Result for {int(args.wait_time)} minutes:")
 
     for condition in sorted(result.items(), key=lambda item: item[1], reverse=True):
         print(f"{condition[0]} - {condition[1]}")
