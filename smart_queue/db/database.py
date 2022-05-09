@@ -28,7 +28,7 @@ def reevaluate_queue():
                     {
                         "uuid": client.uuid,
                         "priority": evaluate_client_priority(
-                            time_arrive=pendulum.instance(client.arrived),
+                            time_arrived=pendulum.instance(client.arrived),
                             complexity=client.complexity,
                         ),
                     }
