@@ -22,7 +22,8 @@
                     <div id="patient-content">
                     {% else %}
                     <div id="no-patient-content">
-                        
+                    {% endif %}
+
                         {% if current_patient %}
                         <p class="text-7xl">
                             {{ current_patient.order_number }}
@@ -49,7 +50,6 @@
                         {% endif %}
 
                     </div>
-                    {% endif %}
                 </div>
             </div>
 
@@ -145,7 +145,7 @@
             <div id="queue-content">
             {% else %}
             <div id="no-queue-content">
-            {% endfor %}
+            {% endif %}
 
 
             
