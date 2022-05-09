@@ -33,6 +33,7 @@ class QueueEndpoint(MethodResource, Resource):
                         "arrived": client.arrived,
                         "condition": client.condition_name,
                         "order_number": client.order_number,
+                        "priority": client.priority
                     }
                     for client in get_queue_status()
                 ]
