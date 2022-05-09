@@ -17,7 +17,7 @@ def evaluate_client_priority(time_arrived, burst_time, urgency) -> int:
     duration = pendulum.now() - time_arrived
 
     # normalize elapsed_time
-    elapsed_time = round((duration.seconds / 60), 5)
+    elapsed_time = duration.seconds, 5
 
     return (elapsed_time * urgency) / burst_time
 
