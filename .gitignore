@@ -18,6 +18,8 @@ config.yaml
 .idea/**/dictionaries
 .idea/**/shelf
 
+configuration_*
+
 # AWS User-specific
 .idea/**/aws.xml
 

@@ -77,7 +77,7 @@ class ConditionEndpoint(MethodResource, Resource):
 
             if "burst_time" in request.json:
                 burst_time = request.json["burst_time"]
-            
+
             if "urgency" in request.json:
                 urgency = request.json["urgency"]
 

@@ -37,6 +37,8 @@ def condition_add_form():
     if request.form["desc"]:
         desc = request.form["desc"]
 
-    insert_condition(name=name, desc=desc, burst_time=burst_time, urgency=urgency)
+    insert_condition(
+        name=name, desc=desc, burst_time=burst_time, urgency=urgency
+    )
 
     return redirect("/")

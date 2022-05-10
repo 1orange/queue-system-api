@@ -34,5 +34,3 @@ setInterval( function() {
         }
     });
 }, 10000); // each 30 sec
-
-

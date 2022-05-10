@@ -34,7 +34,7 @@ def reevaluate_queue():
                         "priority": evaluate_client_priority(
                             time_arrived=pendulum.instance(client.arrived),
                             burst_time=client.burst_time,
-                            urgency=client.urgency
+                            urgency=client.urgency,
                         ),
                     }
                     for client in sql.get_queue_status(pg)
@@ -72,7 +72,14 @@ def get_current_client() -> NamedTuple:
 
         if fetched_client:
             current_client = namedtuple(
-                "Client", ["uuid", "order_number", "arrived", "condition_name", "priority"]
+                "Client",
+                [
+                    "uuid",
+                    "order_number",
+                    "arrived",
+                    "condition_name",
+                    "priority",
+                ],
             )
 
             return current_client(
@@ -80,7 +87,7 @@ def get_current_client() -> NamedTuple:
                 fetched_client.order_number,
                 pendulum.instance(fetched_client.arrived).to_time_string(),
                 fetched_client.condition_name,
-                fetched_client.priority
+                fetched_client.priority,
             )
 
 
@@ -94,6 +101,7 @@ def insert_client(condition_id: int) -> NamedTuple:
 
         return resp
 
+
 def insert_condition(
     name: str, burst_time: int, desc: Optional[str] = None, urgency: int = 1
 ) -> None:
@@ -101,7 +109,9 @@ def insert_condition(
     with psycopg2.connect(
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
-        sql.insert_condition(pg, name=name, desc=desc, burst_time=burst_time, urgency=urgency)
+        sql.insert_condition(
+            pg, name=name, desc=desc, burst_time=burst_time, urgency=urgency
+        )
 
 
 def delete_condition(id) -> None:
@@ -118,7 +128,8 @@ def get_queue_status() -> NamedTuple:
         **config.database, cursor_factory=NamedTupleCursor
     ) as pg:
         client = namedtuple(
-            "Client", ["uuid", "order_number", "arrived", "condition_name", "priority"]
+            "Client",
+            ["uuid", "order_number", "arrived", "condition_name", "priority"],
         )
 
         clients = []
@@ -130,7 +141,7 @@ def get_queue_status() -> NamedTuple:
                     fetched_client.order_number,
                     pendulum.instance(fetched_client.arrived).to_time_string(),
                     fetched_client.condition_name,
-                    fetched_client.priority
+                    fetched_client.priority,
                 )
             )
 
