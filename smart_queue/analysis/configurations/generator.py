@@ -37,7 +37,7 @@ def register_provider(faker_instance):
     faker_instance.add_provider(provider)
 
 
-def generate_configuration(SEED=1):
+def generate_configuration(conf_obj, SEED=1):
     logger.debug(f"Iteration {SEED} - Generating")
     randon_instance = random.Random(SEED)
 
@@ -59,4 +59,4 @@ def generate_configuration(SEED=1):
 
     logger.debug(f"Iteration {SEED} - Done")
 
-    return SEED, sorted(configuration, key=lambda v: v[1])
+    conf_obj[SEED] = sorted(configuration, key=lambda v: v[1])
