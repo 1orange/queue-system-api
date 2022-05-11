@@ -54,12 +54,14 @@ def create_data(number_of_iterations):
 
     configurations = dict()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=128) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=256) as executor:
         for index in range(1, number_of_iterations + 1):
-            executor.submit(generate_configuration, SEED=index, conf_obj=configurations)
+            if index % 10000 == 0:
+                print(f"Iter genaration - {index}")
+            executor.submit(generate_configuration, SEED=index)
 
     # Dump configurations
-    dump_to_file(configurations)
+    # dump_to_file(configurations)
    
     logger.info("Done! Data created")
 
