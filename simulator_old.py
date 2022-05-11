@@ -6,16 +6,17 @@ from pyparsing import line
 
 from smart_queue.analysis import CONDITION_TABLE, CONFIGURATION_PATH
 from smart_queue.analysis.classes.Patient import Patient
+from smart_queue.analysis.classes.store import PriorityBaseStore
 
 
 class Queue(object):
     def __init__(self, env, ambulance, configuration_id, eval_type) -> None:
         self.env = env
-        self.loaded_conf_file = self.load_configuration(
+        self.patients = self.load_configuration(
             configuration_id=configuration_id
         )
         self.ambulance = ambulance
-        # self.current_patient = self.patients.pop(0)
+        self.current_patient = self.patients.pop(0)
         self.type = eval_type
         self.current_waiting_time = 0
 
@@ -28,21 +29,20 @@ class Queue(object):
             duration = pendulum.from_timestamp(self.env.now).timestamp() - pendulum.parse(patient.time_arrived).timestamp()
             
             if duration > 0:
-                return (duration * patient.condition_urgency) / patient.burst_time
+                return -((duration * patient.condition_urgency) / patient.burst_time)
 
-            return 0
+            return 9999
 
-        return 1
+        return 999
 
     def reevaluate_queue(self):
         queue = self.patients
 
         for patient in queue:
             patient.priority = self.eval_priority(patient)
+            yield patient.update_request_priority(self.ambulance)
 
-        # print("Evaluating queue")
-
-        queue = sorted(queue, key = lambda x: (-x.priority, x.time_arrived))
+        queue = sorted(queue, key = lambda x: (x.priority, x.time_arrived))
 
         self.patients = queue
 
@@ -56,58 +56,64 @@ class Queue(object):
         self.reevaluate_queue()
         self.current_patient = self.patients.pop(0)
 
+    
+    def fill_store(self):
+        for patient in self.patients:    
+            self.env.process(
+                self.client(
+                    f"Patient {patient.id}",
+                    self.ambulance,
+                    patient,
+                    procedure_time=patient.burst_time,
+                ),
+            )
 
     def run(self):
-        while not self.loaded_conf_file:
-            self.env.run()
+        self.fill_store()
 
-            current_time = pendulum.from_timestamp(self.env.now).timestamp()
-            arrive_time = pendulum.parse(patient.time_arrived).timestamp()
-
-
-        # for index, patient in enumerate(self.patients):      
-        #     self.env.process(
-        #         self.client(
-        #             f"Patient {patient.id}",
-        #             self.ambulance,
-        #             patient,
-        #             procedure_time=patient.burst_time,
-        #         ),
-        #     )
-
+        self.env.run()
         
     def client(self, name, ambulance, patient, procedure_time):
         current_time = pendulum.from_timestamp(self.env.now).timestamp()
-        ctime_human = pendulum.from_timestamp(self.env.now).to_time_string()
         arrive_time = pendulum.parse(patient.time_arrived).timestamp()
-        atime_human = pendulum.parse(patient.time_arrived).to_time_string()
 
         time_delta = arrive_time - current_time
 
         # Wait till time is actually arive time
         if time_delta > 0:
             yield self.env.timeout(time_delta) 
+        
+
+        # while self.current_patient != patient:
+        #         self.env.step()
 
         self.reevaluate_queue()
         print(f"{name} - Arrived @ {pendulum.from_timestamp(self.env.now).to_time_string()}")
 
-        with ambulance.request() as req:
-            if self.current_patient != patient:
-                yield self.env.timeout(self.current_waiting_time)  # Wait one min, if not chosen by priority
+        with ambulance.request(priority=patient.priority) as req:
+        # patient.req = ambulance.request(priority=-patient.priority)
+            patient.req = req
+            yield patient.req
+
+            try:
+                wait = self.env.now - pendulum.parse(patient.time_arrived).timestamp()
+
+                print(f"{name} - Inside (Waited for {round(wait/60, 3)} min)")
+
+                self.current_waiting_time += procedure_time
+                yield self.env.timeout(procedure_time * 60)
+
+                self.get_next_patient()
+                print(
+                    f"{name} - Out @ {pendulum.from_timestamp(self.env.now).to_time_string()}"
+                )
             
-            yield req
-            
-            wait = self.env.now - pendulum.parse(patient.time_arrived).timestamp()
+            except simpy.Interrupt as interrupt:
+                by = interrupt.cause.by
+                usage = env.now - interrupt.cause.usage_since
+                print(f'{name} got preempted by {by} at {env.now}'
+                        f' after {usage}')
 
-            print(f"{name} - Inside (Waited for {round(wait/60, 3)} min)")
-
-            self.current_waiting_time += procedure_time
-            yield self.env.timeout(procedure_time * 60)
-
-            self.get_next_patient()
-            print(
-                f"{name} - Out @ {pendulum.from_timestamp(self.env.now).to_time_string()}"
-            )
 
     def load_configuration(self, configuration_id: int) -> List[Patient]:
         with open(
@@ -140,6 +146,6 @@ if __name__ == "__main__":
     env = simpy.Environment(
         initial_time=pendulum.parse("08:00:00").timestamp(),
     )
-    ambulance = simpy.Resource(env, capacity=1)
+    ambulance = simpy.PriorityResource(env, capacity=1)
 
     queue = Queue(env, ambulance, 2, 1)

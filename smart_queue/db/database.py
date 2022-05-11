@@ -19,7 +19,7 @@ def evaluate_client_priority(time_arrived, burst_time, urgency) -> int:
     # # normalize elapsed_time
     # elapsed_time = duration.seconds
 
-    return (duration.seconds * urgency) / burst_time
+    return (duration.timestamp() * urgency) / burst_time
 
 
 def reevaluate_queue():
