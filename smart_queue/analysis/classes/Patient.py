@@ -6,28 +6,20 @@ class Patient:
         self.id = patient_id
         self.condition = condition.name
         self.burst_time = int(condition.burst_time)
-        self.priority = 999
+        self.priority = 1
         self.condition_urgency = condition.urgency
-        self.time_arrived = time_arrived
-        self.req = None
-    
-    def update_request_priority(self, resource):
-        self.req.cancel()
+        self.time_arrived = pendulum.parse(time_arrived)
+        self.waiting_time = 0
 
-        with resource.request(priority=self.priority) as req:
-        # self.req = resource.request(priority=-self.priority)
-            self.req = req
-            return self.req
+    def update_waiting_time(self, current_time):
+        duration = current_time - self.time_arrived
+        self.waiting_time = duration.in_minutes()
 
     def __str__(self):
-        return (
-            f"Patient {self.id}({self.condition}, {self.priority}, {self.time_arrived})"
-        )
+        return f"Patient {self.id}({self.condition}, {self.priority}, {self.time_arrived.to_time_string()})"
 
     def __repr__(self):
-        return (
-            f"Patient {self.id}({self.condition}, {self.priority}, {self.time_arrived})"
-        )
+        return f"Patient {self.id}({self.condition}, {self.priority}, {self.time_arrived.to_time_string()})"
 
     def __eq__(self, other):
         return (

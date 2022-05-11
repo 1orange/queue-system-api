@@ -10,6 +10,7 @@
 *.lock
 config.yaml
 .vscode/
+smart_queue/analysis/configurations/generated/data
 
 # User-specific stuff
 .idea/**/workspace.xml

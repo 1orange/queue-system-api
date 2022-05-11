@@ -1,8 +1,8 @@
 import simpy
 from simpy.core import BoundClass
 
-class PriorityGet(simpy.resources.base.Get):
 
+class PriorityGet(simpy.resources.base.Get):
     def __init__(self, resource, priority=10, preempt=True):
         self.priority = priority
         """The priority of this request. A smaller number means higher

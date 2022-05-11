@@ -1,145 +1,167 @@
-from typing import List, Tuple
+import argparse
+import concurrent.futures
+import logging
+import logging.config
+import os
+import shutil
+import statistics
+from collections import defaultdict
 
-import pendulum
-import simpy
-from pyparsing import line
+import pandas as pd
 
+from smart_queue import config
 from smart_queue.analysis import CONDITION_TABLE, CONFIGURATION_PATH
 from smart_queue.analysis.classes.Patient import Patient
+from smart_queue.analysis.classes.Queue import Queue
+from smart_queue.analysis.configurations.generator import (
+    generate_configuration,
+)
+
+logger = logging.getLogger(__name__)
+
+parser = argparse.ArgumentParser(
+    description="Get priority of conditions with given time"
+)
+
+parser.add_argument(
+    "-i",
+    "--iterations",
+    dest="iterations",
+    required=False,
+    help="Number of iterations",
+)
+
+args = parser.parse_args()
 
 
-class Queue(object):
-    def __init__(self, env, ambulance, configuration_id, eval_type) -> None:
-        self.env = env
-        self.loaded_conf_file = self.load_configuration(
-            configuration_id=configuration_id
+def create_data(number_of_iterations):
+    logger.info("Creating iterations data")
+
+    shutil.rmtree(CONFIGURATION_PATH)
+    os.makedirs(CONFIGURATION_PATH)
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=128) as executor:
+        for index in range(1, number_of_iterations + 1):
+            executor.submit(generate_configuration, SEED=index)
+
+    logger.info("Done! Data created")
+
+
+def load_data_from_csv(df, iter_num):
+    patients = []
+
+    filtered_df = df.loc[df["iter"] == iter_num].sort_values(by=["timestamp"])
+
+    for index, row in filtered_df.iterrows():
+        patients.append(
+            Patient(index, CONDITION_TABLE[row["condition"]], row["timestamp"])
         )
-        self.ambulance = ambulance
-        # self.current_patient = self.patients.pop(0)
-        self.type = eval_type
-        self.current_waiting_time = 0
 
-        self.action = self.run()
-
-    def eval_priority(self, patient):
-        # NOTE: Original algorithm is @ smart_queue.db.database
-
-        if self.type == 1:
-            duration = pendulum.from_timestamp(self.env.now).timestamp() - pendulum.parse(patient.time_arrived).timestamp()
-            
-            if duration > 0:
-                return (duration * patient.condition_urgency) / patient.burst_time
-
-            return 0
-
-        return 1
-
-    def reevaluate_queue(self):
-        queue = self.patients
-
-        for patient in queue:
-            patient.priority = self.eval_priority(patient)
-
-        # print("Evaluating queue")
-
-        queue = sorted(queue, key = lambda x: (-x.priority, x.time_arrived))
-
-        self.patients = queue
+    # return sorted(patients, key=lambda x: x.time_arrived)
+    return patients
 
 
-    def get_next_patient(self):
-        new_waiting_time = self.current_waiting_time - self.current_patient.burst_time
-    
-        if new_waiting_time >= 0:
-            self.current_waiting_time = new_waiting_time
-            
-        self.reevaluate_queue()
-        self.current_patient = self.patients.pop(0)
+def simulation_process(queue):
+    res_dict = {}
 
+    for condition, wait_values in queue.simulate().items():
+        if condition in res_dict:
+            res_dict[condition] += wait_values
+        else:
+            res_dict[condition] = wait_values
 
-    def run(self):
-        while not self.loaded_conf_file:
-            self.env.run()
+    return res_dict
 
-            current_time = pendulum.from_timestamp(self.env.now).timestamp()
-            arrive_time = pendulum.parse(patient.time_arrived).timestamp()
+def simulate_process_wrapper(df, iter, res_naive, res_smart):
+    iter_data = load_data_from_csv(df, iter)
 
+    logger.debug(f"Simulation {iter} starting")
 
-        # for index, patient in enumerate(self.patients):      
-        #     self.env.process(
-        #         self.client(
-        #             f"Patient {patient.id}",
-        #             self.ambulance,
-        #             patient,
-        #             procedure_time=patient.burst_time,
-        #         ),
-        #     )
+    naive = Queue(
+        open_time="08:00:00",
+        close_time="16:00:00",
+        iter_data=iter_data[:],
+        naive=True,
+    )
 
+    smart = Queue(
+        open_time="08:00:00",
+        close_time="16:00:00",
+        iter_data=iter_data[:],
+        naive=False,
+    )
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+        naive_result = executor.submit(simulation_process, queue=naive).result()
+        smart_result = executor.submit(simulation_process, queue=smart).result()
         
-    def client(self, name, ambulance, patient, procedure_time):
-        current_time = pendulum.from_timestamp(self.env.now).timestamp()
-        ctime_human = pendulum.from_timestamp(self.env.now).to_time_string()
-        arrive_time = pendulum.parse(patient.time_arrived).timestamp()
-        atime_human = pendulum.parse(patient.time_arrived).to_time_string()
-
-        time_delta = arrive_time - current_time
-
-        # Wait till time is actually arive time
-        if time_delta > 0:
-            yield self.env.timeout(time_delta) 
-
-        self.reevaluate_queue()
-        print(f"{name} - Arrived @ {pendulum.from_timestamp(self.env.now).to_time_string()}")
-
-        with ambulance.request() as req:
-            if self.current_patient != patient:
-                yield self.env.timeout(self.current_waiting_time)  # Wait one min, if not chosen by priority
+        for key in naive_result:
+            if key in res_naive:
+                res_naive[key] += naive_result[key]
+            else:
+                res_naive[key] = naive_result[key]
             
-            yield req
-            
-            wait = self.env.now - pendulum.parse(patient.time_arrived).timestamp()
+            if key in res_smart:
+                res_smart[key] += smart_result[key]
+            else:
+                res_smart[key] = smart_result[key]    
 
-            print(f"{name} - Inside (Waited for {round(wait/60, 3)} min)")
+        logger.debug(f"Simulation {iter} Done")
 
-            self.current_waiting_time += procedure_time
-            yield self.env.timeout(procedure_time * 60)
 
-            self.get_next_patient()
-            print(
-                f"{name} - Out @ {pendulum.from_timestamp(self.env.now).to_time_string()}"
+def simulate(number_of_iterations):
+    logger.info("Starting simulation")
+    df = pd.read_csv(
+        f"{CONFIGURATION_PATH}/data",
+        sep=",",
+        names=["iter", "condition", "timestamp"],
+        header=None,
+    )
+
+    iter_results_naive = dict()
+    iter_results_smart = dict()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+        for iter in range(1, number_of_iterations + 1):
+
+            sim = executor.submit(
+                simulate_process_wrapper,
+                df=df,
+                iter=iter,
+                res_naive=iter_results_naive,
+                res_smart=iter_results_smart,
             )
 
-    def load_configuration(self, configuration_id: int) -> List[Patient]:
-        with open(
-            file=f"{CONFIGURATION_PATH}/configuration_{configuration_id}",
-            # file=f"{CONFIGURATION_PATH}/example",
-            mode="r",
-            encoding="utf-8",
-        ) as file:
-            patients = []
+    logger.info("Gathering data")
+    # Create medians
+    for con in iter_results_naive:
 
-            for pat_id, line in enumerate(file):
-                condition, arrival_time = self._parse_configuration_line(line)
+        iter_results_naive[con] = (
+            statistics.median(iter_results_naive[con]),
+            len(iter_results_naive[con]),
+        )
+        iter_results_smart[con] = (
+            statistics.median(iter_results_smart[con]),
+            len(iter_results_smart[con]),
+        )
 
-                patients.append(
-                    Patient(pat_id, CONDITION_TABLE[condition], arrival_time)
-                )
+    logger.info("Simulation done. Results:\r\n")
 
-            return patients
+    print(f"# NAIVE Q WAITING_TIME_MEDIAN [{number_of_iterations} iters]:")
+    for condition, stats in iter_results_naive.items():
+        print(f"{condition} [{stats[1]}] - {stats[0]} min")
 
-    def _parse_configuration_line(self, line_raw: str) -> Tuple[str, str]:
-        line = line_raw.split()
+    print()
 
-        condition = line[0].strip()
-        arrival_time = line[1].strip()
-
-        return condition, arrival_time
+    print(f"# SMART Q WAITING_TIME_MEDIAN [{number_of_iterations} iters]:")
+    for condition, stats in iter_results_smart.items():
+        print(f"{condition} [{stats[1]}] - {stats[0]} min")
+    print()
 
 
 if __name__ == "__main__":
-    env = simpy.Environment(
-        initial_time=pendulum.parse("08:00:00").timestamp(),
-    )
-    ambulance = simpy.Resource(env, capacity=1)
+    logging.config.dictConfig(config.logging)
 
-    queue = Queue(env, ambulance, 2, 1)
+    # create_data(number_of_iterations)
+    # simulate(int(args.iterations))
+    simulate(1000)

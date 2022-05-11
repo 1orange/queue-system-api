@@ -26,10 +26,15 @@ class Queue(object):
         # NOTE: Original algorithm is @ smart_queue.db.database
 
         if self.type == 1:
-            duration = pendulum.from_timestamp(self.env.now).timestamp() - pendulum.parse(patient.time_arrived).timestamp()
-            
+            duration = (
+                pendulum.from_timestamp(self.env.now).timestamp()
+                - pendulum.parse(patient.time_arrived).timestamp()
+            )
+
             if duration > 0:
-                return -((duration * patient.condition_urgency) / patient.burst_time)
+                return -(
+                    (duration * patient.condition_urgency) / patient.burst_time
+                )
 
             return 9999
 
@@ -42,23 +47,23 @@ class Queue(object):
             patient.priority = self.eval_priority(patient)
             yield patient.update_request_priority(self.ambulance)
 
-        queue = sorted(queue, key = lambda x: (x.priority, x.time_arrived))
+        queue = sorted(queue, key=lambda x: (x.priority, x.time_arrived))
 
         self.patients = queue
 
-
     def get_next_patient(self):
-        new_waiting_time = self.current_waiting_time - self.current_patient.burst_time
-    
+        new_waiting_time = (
+            self.current_waiting_time - self.current_patient.burst_time
+        )
+
         if new_waiting_time >= 0:
             self.current_waiting_time = new_waiting_time
-            
+
         self.reevaluate_queue()
         self.current_patient = self.patients.pop(0)
 
-    
     def fill_store(self):
-        for patient in self.patients:    
+        for patient in self.patients:
             self.env.process(
                 self.client(
                     f"Patient {patient.id}",
@@ -72,7 +77,7 @@ class Queue(object):
         self.fill_store()
 
         self.env.run()
-        
+
     def client(self, name, ambulance, patient, procedure_time):
         current_time = pendulum.from_timestamp(self.env.now).timestamp()
         arrive_time = pendulum.parse(patient.time_arrived).timestamp()
@@ -81,22 +86,26 @@ class Queue(object):
 
         # Wait till time is actually arive time
         if time_delta > 0:
-            yield self.env.timeout(time_delta) 
-        
+            yield self.env.timeout(time_delta)
 
         # while self.current_patient != patient:
         #         self.env.step()
 
         self.reevaluate_queue()
-        print(f"{name} - Arrived @ {pendulum.from_timestamp(self.env.now).to_time_string()}")
+        print(
+            f"{name} - Arrived @ {pendulum.from_timestamp(self.env.now).to_time_string()}"
+        )
 
         with ambulance.request(priority=patient.priority) as req:
-        # patient.req = ambulance.request(priority=-patient.priority)
+            # patient.req = ambulance.request(priority=-patient.priority)
             patient.req = req
             yield patient.req
 
             try:
-                wait = self.env.now - pendulum.parse(patient.time_arrived).timestamp()
+                wait = (
+                    self.env.now
+                    - pendulum.parse(patient.time_arrived).timestamp()
+                )
 
                 print(f"{name} - Inside (Waited for {round(wait/60, 3)} min)")
 
@@ -107,13 +116,14 @@ class Queue(object):
                 print(
                     f"{name} - Out @ {pendulum.from_timestamp(self.env.now).to_time_string()}"
                 )
-            
+
             except simpy.Interrupt as interrupt:
                 by = interrupt.cause.by
                 usage = env.now - interrupt.cause.usage_since
-                print(f'{name} got preempted by {by} at {env.now}'
-                        f' after {usage}')
-
+                print(
+                    f"{name} got preempted by {by} at {env.now}"
+                    f" after {usage}"
+                )
 
     def load_configuration(self, configuration_id: int) -> List[Patient]:
         with open(
