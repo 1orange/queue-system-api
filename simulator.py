@@ -7,6 +7,7 @@ import shutil
 import statistics
 from collections import defaultdict
 
+import numba as nb
 import pandas as pd
 
 from smart_queue import config
@@ -14,7 +15,7 @@ from smart_queue.analysis import CONDITION_TABLE, CONFIGURATION_PATH
 from smart_queue.analysis.classes.Patient import Patient
 from smart_queue.analysis.classes.Queue import Queue
 from smart_queue.analysis.configurations.generator import (
-    generate_configuration,
+    generate_configuration
 )
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,17 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+def dump_to_file(configurations):
+    logger.info("Dumping file")
+    with open(
+        file=f"{CONFIGURATION_PATH}/data", mode="a", encoding="utf-8"
+    ) as configuration_file:
+        for iter in configurations:
+            for patient in configurations[iter]:    
+                print(
+                    f"{iter},{patient[0]},{patient[1]}",
+                    file=configuration_file,
+                )
 
 def create_data(number_of_iterations):
     logger.info("Creating iterations data")
@@ -40,10 +52,18 @@ def create_data(number_of_iterations):
     shutil.rmtree(CONFIGURATION_PATH)
     os.makedirs(CONFIGURATION_PATH)
 
+    configurations = dict()
+
     with concurrent.futures.ProcessPoolExecutor(max_workers=128) as executor:
         for index in range(1, number_of_iterations + 1):
-            executor.submit(generate_configuration, SEED=index)
+            iter, conf = executor.submit(generate_configuration, SEED=index).result()
 
+            configurations[iter] = conf
+
+
+    # Dump configurations
+    dump_to_file(configurations)
+   
     logger.info("Done! Data created")
 
 
@@ -116,12 +136,13 @@ def simulate(number_of_iterations):
         sep=",",
         names=["iter", "condition", "timestamp"],
         header=None,
+        encoding='utf8'
     )
 
     iter_results_naive = dict()
     iter_results_smart = dict()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
         for iter in range(1, number_of_iterations + 1):
 
             sim = executor.submit(
@@ -162,6 +183,5 @@ def simulate(number_of_iterations):
 if __name__ == "__main__":
     logging.config.dictConfig(config.logging)
 
-    # create_data(number_of_iterations)
-    # simulate(int(args.iterations))
-    simulate(1000)
+    create_data(int(args.iterations))
+    # simulate(100)

@@ -2,6 +2,8 @@ import logging
 import logging.config
 import random
 
+import numba as nb
+
 import pendulum
 from faker import Faker
 from faker.providers import DynamicProvider
@@ -35,22 +37,8 @@ def register_provider(faker_instance):
     faker_instance.add_provider(provider)
 
 
-def dump_to_file(configuration, iteration):
-    with open(
-        file=f"{CONFIGURATION_PATH}/data", mode="a", encoding="utf-8"
-    ) as configuration_file:
-        for patient in sorted(configuration, key=lambda v: v[1]):
-            line_size = 50
-            spaces = line_size - len(patient[0]) - len(patient[1])
-
-            print(
-                f"{iteration},{patient[0]},{patient[1]}",
-                file=configuration_file,
-            )
-
-
 def generate_configuration(SEED=1):
-    logger.debug(f"Iteration {SEED} - Generating")
+    logger.info(f"Iteration {SEED} - Generating")
     randon_instance = random.Random(SEED)
 
     fake = Faker()
@@ -69,5 +57,6 @@ def generate_configuration(SEED=1):
         for _ in range(randon_instance.randint(30, 80))
     ]
 
-    dump_to_file(configuration, SEED)
-    logger.debug(f"Iteration {SEED} - Done")
+    logger.info(f"Iteration {SEED} - Done")
+
+    return SEED, sorted(configuration, key=lambda v: v[1])
