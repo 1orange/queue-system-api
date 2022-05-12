@@ -2,6 +2,7 @@ import argparse
 import concurrent.futures
 import logging
 import logging.config
+from multiprocessing import Condition
 import os
 import shutil
 import statistics
@@ -11,9 +12,10 @@ import numba as nb
 import pandas as pd
 
 from smart_queue import config
-from smart_queue.analysis import CONDITION_TABLE, CONFIGURATION_PATH
+from smart_queue.analysis import CONDITION_TABLE, CONFIGURATION_PATH, RESULT_PATH
 from smart_queue.analysis.classes.Patient import Patient
 from smart_queue.analysis.classes.Queue import Queue
+from smart_queue.analysis.classes.Stats import ConditionStats
 from smart_queue.analysis.configurations.generator import (
     generate_configuration
 )
@@ -34,17 +36,12 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-def dump_to_file(configurations):
-    logger.info("Dumping file")
-    with open(
-        file=f"{CONFIGURATION_PATH}/data", mode="a", encoding="utf-8"
-    ) as configuration_file:
-        for iter in configurations:
-            for patient in configurations[iter]:    
-                print(
-                    f"{iter},{patient[0]},{patient[1]}",
-                    file=configuration_file,
-                )
+def dump_to_file(buffer, condition, values):
+    for value in values:
+        print(
+            f"{condition},{value}",
+            file=buffer
+        )
 
 def create_data(number_of_iterations):
     logger.info("Creating iterations data")
@@ -144,7 +141,7 @@ def simulate(number_of_iterations):
     with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
         for iter in range(1, number_of_iterations + 1):
 
-            sim = executor.submit(
+            executor.submit(
                 simulate_process_wrapper,
                 df=df,
                 iter=iter,
@@ -153,34 +150,52 @@ def simulate(number_of_iterations):
             )
 
     logger.info("Gathering data")
-    # Create medians
-    for con in iter_results_naive:
 
-        iter_results_naive[con] = (
-            statistics.median(iter_results_naive[con]),
-            len(iter_results_naive[con]),
-        )
-        iter_results_smart[con] = (
-            statistics.median(iter_results_smart[con]),
-            len(iter_results_smart[con]),
-        )
+    with open(
+        file=f"{RESULT_PATH}/{number_of_iterations}_iters_naive",
+        mode="a",
+        encoding="utf-8"
+    ) as naive_dump, open(
+        file=f"{RESULT_PATH}/{number_of_iterations}_iters_smart",
+        mode="a",
+        encoding="utf-8"
+    ) as smart_dump:
+        for con in iter_results_naive:
+            with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+                executor.submit(dump_to_file(naive_dump, con, iter_results_naive[con]))
+                executor.submit(dump_to_file(smart_dump, con, iter_results_smart[con]))
 
-    logger.info("Simulation done. Results:\r\n")
 
-    print(f"# NAIVE Q WAITING_TIME_MEDIAN [{number_of_iterations} iters]:")
-    for condition, stats in iter_results_naive.items():
-        print(f"{condition} [{stats[1]}] - {stats[0]} min")
+        # iter_results_naive[con] = ConditionStats(
+        #     max_val=max(naive_values),
+        #     min_val=min(naive_values),
+        #     median=statistics.median(naive_values),
+        #     number_of_values=len(naive_values)
+        # )
 
-    print()
+        # iter_results_smart[con] = ConditionStats(
+        #     max_val=max(smart_values),
+        #     min_val=min(smart_values),
+        #     median=statistics.median(smart_values),
+        #     number_of_values=len(smart_values)
+        # )
 
-    print(f"# SMART Q WAITING_TIME_MEDIAN [{number_of_iterations} iters]:")
-    for condition, stats in iter_results_smart.items():
-        print(f"{condition} [{stats[1]}] - {stats[0]} min")
-    print()
+    logger.info("Simulation done.")
+
+    # print(f"# NAIVE Q WAITING_TIME_MEDIAN [{number_of_iterations} iters]:")
+    # for condition, stats in iter_results_naive.items():
+    #     print(f"{condition} [{stats[1]}] - {stats[0]} min")
+
+    # print()
+
+    # print(f"# SMART Q WAITING_TIME_MEDIAN [{number_of_iterations} iters]:")
+    # for condition, stats in iter_results_smart.items():
+    #     print(f"{condition} [{stats[1]}] - {stats[0]} min")
+    # print()
 
 
 if __name__ == "__main__":
     logging.config.dictConfig(config.logging)
 
-    create_data(int(args.iterations))
-    # simulate(100)
+    # create_data(int(args.iterations))
+    simulate(int(args.iterations))

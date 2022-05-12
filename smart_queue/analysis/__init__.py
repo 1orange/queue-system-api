@@ -6,6 +6,9 @@ from smart_queue.db.database import get_all_conditions
 CONFIGURATION_PATH = os.path.abspath(
     os.path.join("smart_queue", "analysis", "configurations", "generated")
 )
+RESULT_PATH = os.path.abspath(
+    os.path.join("smart_queue", "analysis", "results")
+)
 
 CONDITION_TABLE = {
     condition.name: Condition(
