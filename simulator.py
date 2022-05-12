@@ -49,8 +49,6 @@ def create_data(number_of_iterations):
     shutil.rmtree(CONFIGURATION_PATH)
     os.makedirs(CONFIGURATION_PATH)
 
-    configurations = dict()
-
     with concurrent.futures.ProcessPoolExecutor(max_workers=256) as executor:
         for index in range(1, number_of_iterations + 1):
             if index % 10000 == 0:
@@ -138,7 +136,7 @@ def simulate(number_of_iterations):
     iter_results_naive = dict()
     iter_results_smart = dict()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
         for iter in range(1, number_of_iterations + 1):
 
             executor.submit(
