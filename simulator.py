@@ -46,8 +46,8 @@ def dump_to_file(buffer, condition, values):
 def create_data(number_of_iterations):
     logger.info("Creating iterations data")
 
-    shutil.rmtree(CONFIGURATION_PATH)
-    os.makedirs(CONFIGURATION_PATH)
+    # shutil.rmtree(CONFIGURATION_PATH)
+    # os.makedirs(CONFIGURATION_PATH)
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=256) as executor:
         for index in range(1, number_of_iterations + 1):
@@ -114,11 +114,11 @@ def simulate_process_wrapper(df, iter, res_naive, res_smart):
                 res_naive[key] += naive_result[key]
             else:
                 res_naive[key] = naive_result[key]
-            
+
             if key in res_smart:
                 res_smart[key] += smart_result[key]
             else:
-                res_smart[key] = smart_result[key]    
+                res_smart[key] = smart_result[key]
 
         logger.debug(f"Simulation {iter} Done")
 
@@ -126,7 +126,7 @@ def simulate_process_wrapper(df, iter, res_naive, res_smart):
 def simulate(number_of_iterations):
     logger.info("Starting simulation")
     df = pd.read_csv(
-        f"{CONFIGURATION_PATH}/data",
+        f"{CONFIGURATION_PATH}/data_linear",
         sep=",",
         names=["iter", "condition", "timestamp"],
         header=None,
@@ -150,11 +150,11 @@ def simulate(number_of_iterations):
     logger.info("Gathering data")
 
     with open(
-        file=f"{RESULT_PATH}/{number_of_iterations}_iters_naive",
+        file=f"{RESULT_PATH}/{number_of_iterations}_iters_naive_linear",
         mode="a",
         encoding="utf-8"
     ) as naive_dump, open(
-        file=f"{RESULT_PATH}/{number_of_iterations}_iters_smart",
+        file=f"{RESULT_PATH}/{number_of_iterations}_iters_smart_linear",
         mode="a",
         encoding="utf-8"
     ) as smart_dump:
@@ -195,5 +195,5 @@ def simulate(number_of_iterations):
 if __name__ == "__main__":
     logging.config.dictConfig(config.logging)
 
-    # create_data(int(args.iterations))
+    #create_data(int(args.iterations))
     simulate(int(args.iterations))
