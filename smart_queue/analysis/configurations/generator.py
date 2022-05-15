@@ -38,7 +38,7 @@ def register_provider(faker_instance):
 
 def dump_to_file(configuration, iteration):
     with open(
-        file=f"{CONFIGURATION_PATH}/data", mode="a", encoding="utf-8"
+        file=f"{CONFIGURATION_PATH}/data_linear", mode="a", encoding="utf-8"
     ) as configuration_file:
         for patient in sorted(configuration, key=lambda v: v[1]):
             print(
@@ -64,7 +64,7 @@ def generate_configuration(SEED=1):
             generate_condition(fake),
             generate_arrive_time(fake, start_time, end_time),
         )
-        for _ in range(randon_instance.randint(30, 80))
+        for _ in range(50)
     ]
 
     dump_to_file(configuration, SEED)

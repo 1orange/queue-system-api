@@ -3,7 +3,7 @@
 iterations=(100 1000 10000 100000)
 for iter in ${iterations[@]}; do
     echo "Simulating ${iter} iterations:"
-    python run simulator.py --iterations $iter >> /dev/null 2>&1 &
+    python simulator.py --iterations $iter >> /dev/null 2>&1 &
     PID=$!
 
     echo "Waiting to end of simulation"
