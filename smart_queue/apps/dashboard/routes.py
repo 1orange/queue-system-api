@@ -17,9 +17,19 @@ def index():
         next_patient()
 
     return render_template(
-        "base.html",
+        "content/index.html",
         queue=get_queue_status(),
         current_patient=get_current_client(),
+    )
+
+
+@Dash.route("/settings", methods=["POST", "GET"])
+def settings():
+    if request.method == "POST":
+        next_patient()
+
+    return render_template(
+        "content/settings.html",
         conditions=get_all_conditions(),
     )
 
@@ -41,4 +51,4 @@ def condition_add_form():
         name=name, desc=desc, burst_time=burst_time, urgency=urgency
     )
 
-    return redirect("/")
+    return redirect("/settings")

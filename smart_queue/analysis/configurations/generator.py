@@ -3,7 +3,6 @@ import logging.config
 import random
 
 import numba as nb
-
 import pendulum
 from faker import Faker
 from faker.providers import DynamicProvider
@@ -46,6 +45,7 @@ def dump_to_file(configuration, iteration):
                 f"{iteration},{patient[0]},{patient[1]}",
                 file=configuration_file,
             )
+
 
 def generate_configuration(SEED=1):
     logger.debug(f"Iteration {SEED} - Generating")

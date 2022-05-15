@@ -60,8 +60,7 @@ SELECT uuid,
               )
  ORDER 
     BY priority DESC,
-       arrived ASC
- LIMIT 5;
+       arrived ASC;
 
 -- name: get_all_conditions
 SELECT id,

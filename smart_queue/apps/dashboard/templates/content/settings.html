@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+
+<!-- Down container -->
+<div class="flex flex-col h-full w-full bg-gray-100">
+    <h1 class="m-6 text-3xl">Settings</h1>
+
+    <div class="flex flex-row h-3/4 px-10 place-content-center text-center justify-evenly items-center">
+        <form class="w-full" action="/conditions/add" method="post">
+            <div class="flex items-center justify-center h-full">
+                <div class="bg-white py-6 rounded-md px-10 max-w-lg shadow-md">
+                    <h1 class="text-center text-lg font-bold text-gray-500">Add condition</h1>
+                    <div class="space-y-4 mt-6">
+                        <div class="w-full">
+                            <input name="name" type="text" placeholder="name" class="px-4 py-2 bg-gray-50" required />
+                        </div>
+
+                        <div class="w-full">
+                            <input name="desc" type="text" placeholder="description" class="px-4 py-2 bg-gray-50" />
+                        </div>
+
+                        <div class="w-full">
+                            <input name="burst_time" type="number" min="1" placeholder="procedure time"
+                                class="px-4 py-2 bg-gray-50" required />
+                        </div>
+
+                        <div class="w-full">
+                            <input name="urgency" type="number" min="1" placeholder="level of urgency"
+                                class="px-4 py-2 bg-gray-50" required />
+                        </div>
+
+                    </div>
+                    <button type="submit"
+                        class="w-full mt-5 bg-indigo-600 text-white py-2 rounded-md font-semibold tracking-tight">Add</button>
+                </div>
+            </div>
+        </form>
+
+
+        <div class="flex w-full h-full px-5">
+            <table class="border-collapse w-full m-auto">
+                <thead>
+                    <tr>
+                        <th
+                            class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                            Condition</th>
+                        <th
+                            class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                            Description</th>
+                        <th
+                            class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                            Procedure time</th>
+
+                        <th
+                            class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                            urgency</th>
+                        <th
+                            class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                        </th>
+                    </tr>
+                </thead>
+
+
+                <tbody>
+                    {% for condition in conditions %}
+                    <tr id="{{ condition.id }}"
+                        class="row-data max-h-0.5 bg-white lg:hover:bg-gray-100 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
+                        <td
+                            class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
+                            {{ condition.name }}
+                        </td>
+                        <td
+                            class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
+                            {{ condition.description }}
+                        </td>
+                        <td
+                            class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                            {{ condition.burst_time }}
+                        </td>
+                        <td
+                            class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                            {{ condition.urgency }}
+                        </td>
+                        <td
+                            class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                            <input type="button" class="text-blue-400 hover:text-blue-600 underline" value="Remove"
+                                onclick="remove()" />
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{{url_for('static', filename='js/conditions.js')}}"></script>
+
+{% endblock %}

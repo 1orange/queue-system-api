@@ -2,22 +2,26 @@ import argparse
 import concurrent.futures
 import logging
 import logging.config
-from multiprocessing import Condition
 import os
 import shutil
 import statistics
 from collections import defaultdict
+from multiprocessing import Condition
 
 import numba as nb
 import pandas as pd
 
 from smart_queue import config
-from smart_queue.analysis import CONDITION_TABLE, CONFIGURATION_PATH, RESULT_PATH
+from smart_queue.analysis import (
+    CONDITION_TABLE,
+    CONFIGURATION_PATH,
+    RESULT_PATH,
+)
 from smart_queue.analysis.classes.Patient import Patient
 from smart_queue.analysis.classes.Queue import Queue
 from smart_queue.analysis.classes.Stats import ConditionStats
 from smart_queue.analysis.configurations.generator import (
-    generate_configuration
+    generate_configuration,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,12 +40,11 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+
 def dump_to_file(buffer, condition, values):
     for value in values:
-        print(
-            f"{condition},{value}",
-            file=buffer
-        )
+        print(f"{condition},{value}", file=buffer)
+
 
 def create_data(number_of_iterations):
     logger.info("Creating iterations data")
@@ -57,7 +60,7 @@ def create_data(number_of_iterations):
 
     # Dump configurations
     # dump_to_file(configurations)
-   
+
     logger.info("Done! Data created")
 
 
@@ -86,6 +89,7 @@ def simulation_process(queue):
 
     return res_dict
 
+
 def simulate_process_wrapper(df, iter, res_naive, res_smart):
     iter_data = load_data_from_csv(df, iter)
 
@@ -106,19 +110,23 @@ def simulate_process_wrapper(df, iter, res_naive, res_smart):
     )
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-        naive_result = executor.submit(simulation_process, queue=naive).result()
-        smart_result = executor.submit(simulation_process, queue=smart).result()
-        
+        naive_result = executor.submit(
+            simulation_process, queue=naive
+        ).result()
+        smart_result = executor.submit(
+            simulation_process, queue=smart
+        ).result()
+
         for key in naive_result:
             if key in res_naive:
                 res_naive[key] += naive_result[key]
             else:
                 res_naive[key] = naive_result[key]
-            
+
             if key in res_smart:
                 res_smart[key] += smart_result[key]
             else:
-                res_smart[key] = smart_result[key]    
+                res_smart[key] = smart_result[key]
 
         logger.debug(f"Simulation {iter} Done")
 
@@ -126,11 +134,11 @@ def simulate_process_wrapper(df, iter, res_naive, res_smart):
 def simulate(number_of_iterations):
     logger.info("Starting simulation")
     df = pd.read_csv(
-        f"{CONFIGURATION_PATH}/data",
+        f"{RESULT_PATH}/10000_iters_smart_linear",
         sep=",",
-        names=["iter", "condition", "timestamp"],
+        names=["condition", "wait-time"],
         header=None,
-        encoding='utf8'
+        encoding="utf8",
     )
 
     iter_results_naive = dict()
@@ -152,17 +160,22 @@ def simulate(number_of_iterations):
     with open(
         file=f"{RESULT_PATH}/{number_of_iterations}_iters_naive",
         mode="a",
-        encoding="utf-8"
+        encoding="utf-8",
     ) as naive_dump, open(
         file=f"{RESULT_PATH}/{number_of_iterations}_iters_smart",
         mode="a",
-        encoding="utf-8"
+        encoding="utf-8",
     ) as smart_dump:
         for con in iter_results_naive:
-            with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-                executor.submit(dump_to_file(naive_dump, con, iter_results_naive[con]))
-                executor.submit(dump_to_file(smart_dump, con, iter_results_smart[con]))
-
+            with concurrent.futures.ProcessPoolExecutor(
+                max_workers=2
+            ) as executor:
+                executor.submit(
+                    dump_to_file(naive_dump, con, iter_results_naive[con])
+                )
+                executor.submit(
+                    dump_to_file(smart_dump, con, iter_results_smart[con])
+                )
 
         # iter_results_naive[con] = ConditionStats(
         #     max_val=max(naive_values),

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Queue{% endblock %}
+
+{% block content %}
+
+<!-- Container -->
+<div class="flex flex-row flex-grow">
+    <!-- Left container -->
+    <div class="flex flex-col w-full bg-gray-100">
+        <!-- Up container -->
+        <h1 class="m-6 text-3xl">Current patient</h1>
+        <div
+            class="flex h-1/2 w-full h-max-h-full place-content-center text-center items-center justify-center">
+            <div id="patient"
+                class="my-5 bg-white font-semibold text-center rounded-3xl border shadow-lg p-10 max-w-xs">
+
+                <div id="patient-content">
+                    {% if current_patient %}
+                    <p class="text-7xl">
+                        {{ current_patient.order_number }}
+                    </p>
+
+                    <h1 class="text-lg text-gray-700">
+                        {{ current_patient.condition_name }}
+                    </h1>
+
+                    <h3 class="text-sm text-gray-400 ">
+                        {{ current_patient.arrived }}
+                    </h3>
+
+                    <p class="text-xs text-gray-400 mt-4">
+                        {{ current_patient.priority }}
+                    </p>
+
+                    <p class="text-xs text-gray-400 mt-4">
+                        {{ current_patient.uuid }}
+                    </p>
+
+                    <form method="post">
+                        <button
+                            class="bg-sky-500 px-8 py-2 mt-8 rounded-3xl text-gray-100 font-semibold uppercase">
+                            Next patient
+                        </button>
+                    </form>
+
+                    {% else %}
+                    <p class="text-3xl">
+                        No patient waiting.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right container -->
+    <div id="queue-wrapper" class="w-1/2 flex flex-col flex-grow text-center bg-gray-300">
+        <div id="queue">
+            
+            <div id="queue-content">
+                <h1 class="m-6 text-3xl">Current queue ({{queue|length}})</h1>
+                <div class="flex flex-col gap-4 px-8 items-center">
+                    {% for elem in queue[:5] %}
+
+                    <div class="w-full border-2 border-b-4 items-center justify-center border-gray-200 rounded-xl hover:bg-gray-50 bg-white">
+
+                        <div class="flex flex-grow flex-row p-8 items-center justify-evenly">
+
+                            <!-- Order number -->
+                            <p
+                                class="text-white text-5xl bg-sky-500 w-16 h-16 rounded-full flex justify-center items-center text-center align-middle">
+                                {{ elem.order_number }}
+                            </p>
+
+                            <!-- Description -->
+                            <div class="flex flex-col ml-4 justify-center items-center">
+
+                                <p class="text-gray-600 font-bold"> {{ elem.condition_name }} </p>
+
+                                <p class="text-gray-400"> {{ elem.arrived }} </p>
+
+                            </div>
+
+                            <!-- patient type -->
+                            <p class="py-1 px-3 text-sky-500 text-xs flex h-full justify-center items-center">
+                                NEW PATIENT
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{url_for('static', filename='js/update.js')}}"></script>
+{% endblock %}
